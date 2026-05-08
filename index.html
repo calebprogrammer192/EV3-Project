@@ -3,175 +3,200 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EV3 Driving Base — Project Documentation</title>
+<title>EV3 Project Documentation</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0f14;
-    --surface: #141720;
-    --surface2: #1c2130;
-    --accent: #f5c842;
-    --accent2: #3de8b0;
-    --accent3: #ff5f5f;
-    --text: #e8eaf0;
-    --muted: #7a8099;
-    --border: #252b3b;
-    --radius: 10px;
+    --bg: #0d0f14; --surface: #141720; --surface2: #1c2130;
+    --accent: #f5c842; --accent2: #3de8b0; --accent3: #ff5f5f;
+    --text: #e8eaf0; --muted: #7a8099; --border: #252b3b; --radius: 10px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(245,200,66,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,200,66,.04) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); font-family:'Syne',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(245,200,66,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,200,66,.04) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:0; }
 
   /* NAV */
-  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 58px; background: rgba(13,15,20,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
-  .nav-logo { display: flex; align-items: center; gap: .6rem; font-family: 'Space Mono', monospace; font-weight: 700; font-size: .9rem; color: var(--accent); text-decoration: none; }
-  .brick { width: 30px; height: 20px; background: var(--accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; }
-  .brick span { width: 5px; height: 5px; background: #0d0f14; border-radius: 50%; display: block; }
-  .nav-links { display: flex; gap: 1.3rem; list-style: none; }
-  .nav-links a { color: var(--muted); text-decoration: none; font-size: .78rem; font-weight: 600; letter-spacing: .05em; transition: color .2s; }
-  .nav-links a:hover { color: var(--accent); }
-  .nav-pill { background: rgba(245,200,66,.12); border: 1px solid rgba(245,200,66,.3); color: var(--accent); font-family: 'Space Mono', monospace; font-size: .65rem; font-weight: 700; padding: .3rem .8rem; border-radius: 20px; }
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 2rem; height:58px; background:rgba(13,15,20,.94); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); gap:1rem; }
+  .nav-logo { display:flex; align-items:center; gap:.6rem; font-family:'Space Mono',monospace; font-weight:700; font-size:.88rem; color:var(--accent); text-decoration:none; flex-shrink:0; }
+  .brick { width:28px; height:18px; background:var(--accent); border-radius:4px; display:flex; align-items:center; justify-content:center; gap:3px; }
+  .brick span { width:4px; height:4px; background:#0d0f14; border-radius:50%; display:block; }
+  .nav-links { display:flex; gap:1.1rem; list-style:none; }
+  .nav-links a { color:var(--muted); text-decoration:none; font-size:.75rem; font-weight:600; letter-spacing:.04em; transition:color .2s; }
+  .nav-links a:hover { color:var(--accent); }
+
+  /* PROJECT SWITCHER in nav */
+  .proj-switcher { display:flex; gap:.4rem; flex-shrink:0; }
+  .proj-btn { font-family:'Space Mono',monospace; font-size:.65rem; font-weight:700; padding:.32rem .85rem; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .2s; white-space:nowrap; }
+  .proj-btn.active { background:var(--accent); color:#0d0f14; border-color:var(--accent); }
+  .proj-btn:not(.active):hover { border-color:var(--accent); color:var(--accent); }
+
+  /* PROJECT PAGES */
+  .project-page { display:none; }
+  .project-page.active { display:block; }
 
   /* HERO */
-  .hero { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 6rem 2rem 3rem; }
-  .hero-glow { position: absolute; width: 700px; height: 500px; background: radial-gradient(ellipse,rgba(245,200,66,.1) 0%,transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
-  .hero-chip { display: inline-flex; align-items: center; gap: .5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: .3rem 1rem; font-family: 'Space Mono', monospace; font-size: .72rem; color: var(--accent2); margin-bottom: 1.8rem; animation: fd .6s ease both; }
-  .hero-chip .dot { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: pulse 2s infinite; }
+  .hero { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:6rem 2rem 3rem; }
+  .hero-glow { position:absolute; width:700px; height:500px; background:radial-gradient(ellipse,rgba(245,200,66,.1) 0%,transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; }
+  .hero-glow-color { background:radial-gradient(ellipse,rgba(61,232,176,.08) 0%,rgba(245,200,66,.06) 50%,transparent 70%); }
+  .hero-chip { display:inline-flex; align-items:center; gap:.5rem; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:.3rem 1rem; font-family:'Space Mono',monospace; font-size:.72rem; color:var(--accent2); margin-bottom:1.8rem; animation:fd .6s ease both; }
+  .hero-chip .dot { width:6px; height:6px; background:var(--accent2); border-radius:50%; animation:pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-  .hero h1 { font-size: clamp(3rem,8vw,6rem); font-weight: 800; line-height: 1.0; letter-spacing: -.03em; margin-bottom: 1rem; animation: fd .7s ease .1s both; }
-  .hero h1 .hl { color: var(--accent); }
-  .hero-sub { font-size: 1.05rem; color: var(--muted); max-width: 520px; line-height: 1.75; margin-bottom: 2.5rem; animation: fd .7s ease .2s both; }
-  .hero-stats { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2.5rem; animation: fd .7s ease .3s both; }
-  .stat { text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .9rem 1.4rem; min-width: 95px; }
-  .stat-val { font-size: 1.6rem; font-weight: 800; color: var(--accent); line-height: 1; }
-  .stat-lbl { font-size: .7rem; color: var(--muted); margin-top: .3rem; font-family: 'Space Mono', monospace; }
-  .robot-wrap { margin-top: 3rem; animation: float 4s ease-in-out infinite, fd .9s ease .4s both; }
-  .robot-svg { width: 210px; filter: drop-shadow(0 0 28px rgba(245,200,66,.2)); }
+  .hero h1 { font-size:clamp(2.8rem,7vw,5.5rem); font-weight:800; line-height:1.0; letter-spacing:-.03em; margin-bottom:1rem; animation:fd .7s ease .1s both; }
+  .hero h1 .hl { color:var(--accent); }
+  .hero h1 .hl2 { color:var(--accent2); }
+  .hero-sub { font-size:1rem; color:var(--muted); max-width:520px; line-height:1.75; margin-bottom:2.5rem; animation:fd .7s ease .2s both; }
+  .hero-stats { display:flex; gap:1.1rem; flex-wrap:wrap; justify-content:center; margin-bottom:2.5rem; animation:fd .7s ease .3s both; }
+  .stat { text-align:center; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:.85rem 1.3rem; min-width:90px; }
+  .stat-val { font-size:1.5rem; font-weight:800; color:var(--accent); line-height:1; }
+  .stat-val2 { color:var(--accent2); }
+  .stat-lbl { font-size:.68rem; color:var(--muted); margin-top:.3rem; font-family:'Space Mono',monospace; }
+  .robot-wrap { margin-top:3rem; animation:float 4s ease-in-out infinite, fd .9s ease .4s both; }
+  .robot-svg { width:200px; filter:drop-shadow(0 0 26px rgba(245,200,66,.2)); }
+  .sensor-svg { width:200px; filter:drop-shadow(0 0 26px rgba(61,232,176,.2)); }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-  /* SHARED */
-  section { position: relative; z-index: 1; }
-  .section-inner { max-width: 1080px; margin: 0 auto; padding: 5rem 2rem; }
-  .section-label { font-family: 'Space Mono', monospace; font-size: .68rem; letter-spacing: .15em; color: var(--accent); text-transform: uppercase; margin-bottom: .6rem; }
-  .section-title { font-size: clamp(1.7rem,4vw,2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: .8rem; }
-  .section-sub { color: var(--muted); font-size: .95rem; line-height: 1.7; max-width: 560px; margin-bottom: 3rem; }
-  .alt { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .alt2 { background: var(--surface2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  /* SHARED SECTIONS */
+  section { position:relative; z-index:1; }
+  .section-inner { max-width:1080px; margin:0 auto; padding:4.5rem 2rem; }
+  .section-label { font-family:'Space Mono',monospace; font-size:.65rem; letter-spacing:.15em; color:var(--accent); text-transform:uppercase; margin-bottom:.6rem; }
+  .section-label2 { color:var(--accent2); }
+  .section-title { font-size:clamp(1.6rem,3.5vw,2.3rem); font-weight:800; line-height:1.15; margin-bottom:.8rem; }
+  .section-sub { color:var(--muted); font-size:.93rem; line-height:1.7; max-width:560px; margin-bottom:2.8rem; }
+  .alt { background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .alt2 { background:var(--surface2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+
+  /* PROJECT DIVIDER BANNER */
+  .proj-banner { position:relative; z-index:1; padding:1rem 2rem; display:flex; align-items:center; gap:1rem; border-top:2px solid var(--accent); border-bottom:1px solid var(--border); background:rgba(245,200,66,.04); }
+  .proj-banner-num { font-family:'Space Mono',monospace; font-size:2rem; font-weight:700; color:var(--accent); opacity:.15; }
+  .proj-banner-title { font-size:1.1rem; font-weight:800; }
+  .proj-banner-sub { font-size:.78rem; color:var(--muted); margin-top:.1rem; font-family:'Space Mono',monospace; }
+  .proj-banner2 { border-top-color:var(--accent2); background:rgba(61,232,176,.04); }
+  .proj-banner2 .proj-banner-num { color:var(--accent2); }
 
   /* TEAM */
-  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 1.1rem; }
-  .team-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem 1.2rem; text-align: center; transition: border-color .25s, transform .25s; }
-  .team-card:hover { border-color: rgba(245,200,66,.4); transform: translateY(-4px); }
-  .team-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto .9rem; border: 2px solid var(--border); }
-  .team-name { font-weight: 800; font-size: 1rem; margin-bottom: .25rem; }
-  .team-role { font-family: 'Space Mono', monospace; font-size: .65rem; color: var(--muted); margin-bottom: .9rem; letter-spacing: .05em; }
-  .team-status { display: inline-block; font-family: 'Space Mono', monospace; font-size: .62rem; font-weight: 700; padding: .22rem .65rem; border-radius: 20px; }
-  .ts-active { background: rgba(61,232,176,.15); color: var(--accent2); }
-  .ts-building { background: rgba(245,200,66,.15); color: var(--accent); }
-  .ts-testing { background: rgba(255,148,96,.15); color: #ff9d6c; }
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:1rem; }
+  .team-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem 1rem; text-align:center; transition:border-color .25s,transform .25s; }
+  .team-card:hover { border-color:rgba(245,200,66,.4); transform:translateY(-4px); }
+  .team-avatar { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin:0 auto .8rem; border:2px solid var(--border); }
+  .team-name { font-weight:800; font-size:.95rem; margin-bottom:.2rem; }
+  .team-role { font-family:'Space Mono',monospace; font-size:.62rem; color:var(--muted); margin-bottom:.8rem; letter-spacing:.05em; }
+  .team-status { display:inline-block; font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700; padding:.2rem .6rem; border-radius:20px; }
+  .ts-active { background:rgba(61,232,176,.15); color:var(--accent2); }
+  .ts-building { background:rgba(245,200,66,.15); color:var(--accent); }
+  .ts-testing { background:rgba(255,148,96,.15); color:#ff9d6c; }
 
   /* PARTS */
-  .parts-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 1rem; }
-  .part-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.3rem; display: flex; align-items: center; gap: 1rem; transition: border-color .2s; }
-  .part-card:hover { border-color: rgba(245,200,66,.35); }
-  .part-icon { width: 40px; height: 40px; flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; }
-  .part-name { font-weight: 700; font-size: .9rem; }
-  .part-detail { font-size: .73rem; color: var(--muted); margin-top: .15rem; font-family: 'Space Mono', monospace; }
-  .part-qty { margin-left: auto; flex-shrink: 0; background: rgba(245,200,66,.12); color: var(--accent); font-family: 'Space Mono', monospace; font-size: .7rem; font-weight: 700; padding: .25rem .6rem; border-radius: 20px; }
+  .parts-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(255px,1fr)); gap:.9rem; }
+  .part-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.2rem; display:flex; align-items:center; gap:.9rem; transition:border-color .2s; }
+  .part-card:hover { border-color:rgba(245,200,66,.35); }
+  .part-icon { width:38px; height:38px; flex-shrink:0; background:var(--surface); border:1px solid var(--border); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+  .part-name { font-weight:700; font-size:.88rem; }
+  .part-detail { font-size:.7rem; color:var(--muted); margin-top:.12rem; font-family:'Space Mono',monospace; }
+  .part-qty { margin-left:auto; flex-shrink:0; background:rgba(245,200,66,.12); color:var(--accent); font-family:'Space Mono',monospace; font-size:.68rem; font-weight:700; padding:.22rem .55rem; border-radius:20px; }
 
   /* BUILD STEPS */
-  .build-step { display: grid; grid-template-columns: 52px 1fr; gap: 1.4rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; margin-bottom: .8rem; transition: border-color .2s, transform .2s; }
-  .build-step:hover { border-color: rgba(245,200,66,.3); transform: translateX(4px); }
-  .bs-num { width: 44px; height: 44px; background: var(--accent); color: #0d0f14; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: .9rem; font-weight: 700; flex-shrink: 0; }
-  .bs-title { font-weight: 700; font-size: 1rem; margin-bottom: .4rem; }
-  .bs-desc { font-size: .85rem; color: var(--muted); line-height: 1.65; }
-  .bs-tip { margin-top: .8rem; background: rgba(61,232,176,.07); border-left: 3px solid var(--accent2); padding: .5rem .8rem; border-radius: 0 6px 6px 0; font-size: .8rem; color: var(--accent2); }
+  .build-step { display:grid; grid-template-columns:50px 1fr; gap:1.3rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem; margin-bottom:.75rem; transition:border-color .2s,transform .2s; }
+  .build-step:hover { border-color:rgba(245,200,66,.3); transform:translateX(4px); }
+  .bs-num { width:42px; height:42px; background:var(--accent); color:#0d0f14; border-radius:9px; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:.88rem; font-weight:700; flex-shrink:0; }
+  .bs-num2 { background:var(--accent2); }
+  .bs-title { font-weight:700; font-size:.97rem; margin-bottom:.35rem; }
+  .bs-desc { font-size:.83rem; color:var(--muted); line-height:1.65; }
+  .bs-tip { margin-top:.75rem; background:rgba(61,232,176,.07); border-left:3px solid var(--accent2); padding:.45rem .75rem; border-radius:0 6px 6px 0; font-size:.78rem; color:var(--accent2); }
 
-  /* PROGRAMMING — STOCK CODE */
-  .stock-intro { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem 1.6rem; margin-bottom: 2.5rem; display: flex; gap: 1.2rem; align-items: flex-start; }
-  .stock-intro-icon { font-size: 1.8rem; flex-shrink: 0; margin-top: .1rem; }
-  .stock-intro-text { font-size: .88rem; color: var(--muted); line-height: 1.75; }
-  .stock-intro-text strong { color: var(--text); }
+  /* PROGRAMMING */
+  .stock-intro { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem 1.5rem; margin-bottom:2.2rem; display:flex; gap:1.1rem; align-items:flex-start; }
+  .stock-intro-icon { font-size:1.7rem; flex-shrink:0; margin-top:.1rem; }
+  .stock-intro-text { font-size:.86rem; color:var(--muted); line-height:1.75; }
+  .stock-intro-text strong { color:var(--text); }
+  .task-block { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.6rem; }
+  .task-header { display:flex; align-items:center; gap:1rem; padding:1rem 1.3rem; border-bottom:1px solid var(--border); background:var(--surface); flex-wrap:wrap; }
+  .task-num { width:30px; height:30px; flex-shrink:0; background:var(--surface2); border:1px solid var(--border); border-radius:7px; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:.72rem; color:var(--accent); font-weight:700; }
+  .task-title { font-weight:700; font-size:.97rem; flex:1; }
+  .task-badge { flex-shrink:0; font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700; padding:.2rem .55rem; border-radius:20px; }
+  .tb-beg { background:rgba(61,232,176,.15); color:var(--accent2); }
+  .tb-int { background:rgba(245,200,66,.15); color:var(--accent); }
+  .tb-adv { background:rgba(255,95,95,.15); color:var(--accent3); }
+  .task-body { padding:1.3rem; }
+  .task-goal { font-size:.85rem; color:var(--muted); line-height:1.7; margin-bottom:1.3rem; }
 
-  .task-block { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.8rem; }
-  .task-header { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
-  .task-num { width: 32px; height: 32px; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: .75rem; color: var(--accent); font-weight: 700; }
-  .task-title { font-weight: 700; font-size: 1rem; flex: 1; }
-  .task-badge { flex-shrink: 0; font-family: 'Space Mono', monospace; font-size: .62rem; font-weight: 700; padding: .22rem .6rem; border-radius: 20px; }
-  .tb-beg { background: rgba(61,232,176,.15); color: var(--accent2); }
-  .tb-int { background: rgba(245,200,66,.15); color: var(--accent); }
-  .tb-adv { background: rgba(255,95,95,.15); color: var(--accent3); }
-  .task-body { padding: 1.4rem; }
-  .task-goal { font-size: .87rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.4rem; }
+  /* EV3 Block visuals */
+  .block-visual { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.1rem 1.3rem; margin-bottom:.9rem; }
+  .bv-label { font-family:'Space Mono',monospace; font-size:.62rem; color:var(--accent); font-weight:700; margin-bottom:.9rem; letter-spacing:.1em; }
+  .blocks-row { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; }
+  .ev3-block { border-radius:8px; padding:.5rem .9rem; font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700; position:relative; display:flex; flex-direction:column; gap:.18rem; min-width:95px; }
+  .ev3-block::before { content:''; position:absolute; left:-7px; top:50%; transform:translateY(-50%); width:0; height:0; border-top:7px solid transparent; border-bottom:7px solid transparent; }
+  .ev3-block:first-child::before { display:none; }
+  .block-green { background:#1a3a2a; border:1.5px solid #3de8b0; color:#3de8b0; }
+  .block-green::before { border-right:7px solid #3de8b0; }
+  .block-blue { background:#1a2a3a; border:1.5px solid #5bc0f5; color:#5bc0f5; }
+  .block-blue::before { border-right:7px solid #5bc0f5; }
+  .block-orange { background:#2a1f0a; border:1.5px solid #f5a623; color:#f5a623; }
+  .block-orange::before { border-right:7px solid #f5a623; }
+  .block-red { background:#2a0f0f; border:1.5px solid #ff5f5f; color:#ff5f5f; }
+  .block-red::before { border-right:7px solid #ff5f5f; }
+  .block-yellow { background:#2a260a; border:1.5px solid #f5c842; color:#f5c842; }
+  .block-yellow::before { border-right:7px solid #f5c842; }
+  .block-purple { background:#1f1a3a; border:1.5px solid #bb86fc; color:#bb86fc; }
+  .block-purple::before { border-right:7px solid #bb86fc; }
+  .block-teal { background:#0a2a26; border:1.5px solid #3de8b0; color:#3de8b0; }
+  .block-teal::before { border-right:7px solid #3de8b0; }
+  .block-name { font-size:.7rem; }
+  .block-val { font-size:.62rem; opacity:.75; }
+  .block-arrow { color:var(--muted); font-size:.85rem; flex-shrink:0; }
 
-  /* Block visual */
-  .block-visual { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
-  .bv-label { font-family: 'Space Mono', monospace; font-size: .65rem; color: var(--accent); font-weight: 700; margin-bottom: 1rem; letter-spacing: .1em; }
-  .blocks-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
-  .ev3-block { border-radius: 8px; padding: .55rem 1rem; font-family: 'Space Mono', monospace; font-size: .72rem; font-weight: 700; position: relative; display: flex; flex-direction: column; gap: .2rem; min-width: 100px; }
-  .ev3-block::before { content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
-  .ev3-block:first-child::before { display: none; }
-  .block-green { background: #1a3a2a; border: 1.5px solid #3de8b0; color: #3de8b0; }
-  .block-green::before { border-right: 8px solid #3de8b0; }
-  .block-blue { background: #1a2a3a; border: 1.5px solid #5bc0f5; color: #5bc0f5; }
-  .block-blue::before { border-right: 8px solid #5bc0f5; }
-  .block-orange { background: #2a1f0a; border: 1.5px solid #f5a623; color: #f5a623; }
-  .block-orange::before { border-right: 8px solid #f5a623; }
-  .block-red { background: #2a0f0f; border: 1.5px solid #ff5f5f; color: #ff5f5f; }
-  .block-red::before { border-right: 8px solid #ff5f5f; }
-  .block-yellow { background: #2a260a; border: 1.5px solid #f5c842; color: #f5c842; }
-  .block-yellow::before { border-right: 8px solid #f5c842; }
-  .block-name { font-size: .72rem; }
-  .block-val { font-size: .65rem; opacity: .75; }
-  .block-arrow { color: var(--muted); font-size: .9rem; flex-shrink: 0; }
+  .doc-prompt { margin-top:1rem; background:rgba(245,200,66,.06); border:1px solid rgba(245,200,66,.2); border-radius:8px; padding:.85rem 1rem; font-size:.82rem; line-height:1.7; }
+  .doc-prompt strong { color:var(--accent); }
+  .doc-prompt span { color:var(--muted); }
+  .settings-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.7rem; margin-top:.75rem; }
+  .setting-row { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:.65rem .95rem; display:flex; justify-content:space-between; align-items:center; }
+  .setting-key { color:var(--muted); font-family:'Space Mono',monospace; font-size:.7rem; }
+  .setting-val { color:var(--accent); font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700; }
+  .setting-val2 { color:var(--accent2); }
 
-  .doc-prompt { margin-top: 1.1rem; background: rgba(245,200,66,.06); border: 1px solid rgba(245,200,66,.2); border-radius: 8px; padding: .9rem 1.1rem; font-size: .83rem; line-height: 1.7; }
-  .doc-prompt strong { color: var(--accent); }
-  .doc-prompt span { color: var(--muted); }
-
-  .settings-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: .8rem; margin-top: .8rem; }
-  .setting-row { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: .7rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: .82rem; }
-  .setting-key { color: var(--muted); font-family: 'Space Mono', monospace; font-size: .72rem; }
-  .setting-val { color: var(--accent); font-family: 'Space Mono', monospace; font-size: .72rem; font-weight: 700; }
+  /* COLOR SWATCHES */
+  .color-swatches { display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.9rem; }
+  .swatch { display:flex; align-items:center; gap:.5rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:.5rem .9rem; font-family:'Space Mono',monospace; font-size:.7rem; }
+  .swatch-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
 
   /* REFLECTION */
-  .reflection-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 1.2rem; }
-  .reflect-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; transition: border-color .2s; }
-  .reflect-card:hover { border-color: rgba(245,200,66,.3); }
-  .reflect-q { font-weight: 700; font-size: .92rem; margin-bottom: .8rem; display: flex; gap: .5rem; align-items: flex-start; }
-  .reflect-q .qmark { color: var(--accent); font-family: 'Space Mono', monospace; font-size: .85rem; flex-shrink: 0; }
-  .reflect-area { width: 100%; min-height: 90px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: .75rem; color: var(--text); font-family: 'Syne', sans-serif; font-size: .85rem; line-height: 1.6; resize: vertical; transition: border-color .2s; }
-  .reflect-area:focus { outline: none; border-color: rgba(245,200,66,.5); }
-  .reflect-area::placeholder { color: var(--muted); }
+  .reflection-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(295px,1fr)); gap:1.1rem; }
+  .reflect-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem; transition:border-color .2s; }
+  .reflect-card:hover { border-color:rgba(245,200,66,.3); }
+  .reflect-q { font-weight:700; font-size:.9rem; margin-bottom:.75rem; display:flex; gap:.5rem; align-items:flex-start; }
+  .reflect-q .qmark { color:var(--accent); font-family:'Space Mono',monospace; font-size:.82rem; flex-shrink:0; }
+  .reflect-area { width:100%; min-height:85px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:.7rem; color:var(--text); font-family:'Syne',sans-serif; font-size:.83rem; line-height:1.6; resize:vertical; transition:border-color .2s; }
+  .reflect-area:focus { outline:none; border-color:rgba(245,200,66,.5); }
+  .reflect-area::placeholder { color:var(--muted); }
 
   /* CHECKLIST */
-  .pb-label { display: flex; justify-content: space-between; margin-bottom: .5rem; font-family: 'Space Mono', monospace; font-size: .72rem; color: var(--muted); }
-  .pb { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 2.5rem; }
-  .pb-fill { height: 100%; background: linear-gradient(90deg,var(--accent2),var(--accent)); border-radius: 4px; transition: width .6s ease; }
-  .checklist { display: flex; flex-direction: column; gap: .6rem; }
-  .check-item { display: flex; align-items: center; gap: .9rem; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: .85rem 1.2rem; cursor: pointer; transition: all .2s; user-select: none; }
-  .check-item:hover { border-color: rgba(245,200,66,.3); }
-  .check-item.done { background: rgba(61,232,176,.05); border-color: rgba(61,232,176,.25); }
-  .cb { width: 20px; height: 20px; flex-shrink: 0; border: 2px solid var(--muted); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: .7rem; transition: all .2s; }
-  .check-item.done .cb { background: var(--accent2); border-color: var(--accent2); color: #0d0f14; }
-  .check-item.done .ci-text { color: var(--muted); text-decoration: line-through; }
-  .ci-text { font-size: .88rem; }
-  .ci-sub { font-size: .73rem; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: .1rem; }
+  .pb-label { display:flex; justify-content:space-between; margin-bottom:.45rem; font-family:'Space Mono',monospace; font-size:.7rem; color:var(--muted); }
+  .pb { height:7px; background:var(--surface2); border-radius:4px; overflow:hidden; border:1px solid var(--border); margin-bottom:2.2rem; }
+  .pb-fill { height:100%; background:linear-gradient(90deg,var(--accent2),var(--accent)); border-radius:4px; transition:width .6s ease; }
+  .checklist { display:flex; flex-direction:column; gap:.55rem; }
+  .check-item { display:flex; align-items:center; gap:.85rem; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:.8rem 1.1rem; cursor:pointer; transition:all .2s; user-select:none; }
+  .check-item:hover { border-color:rgba(245,200,66,.3); }
+  .check-item.done { background:rgba(61,232,176,.05); border-color:rgba(61,232,176,.25); }
+  .cb { width:19px; height:19px; flex-shrink:0; border:2px solid var(--muted); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:.68rem; transition:all .2s; }
+  .check-item.done .cb { background:var(--accent2); border-color:var(--accent2); color:#0d0f14; }
+  .check-item.done .ci-text { color:var(--muted); text-decoration:line-through; }
+  .ci-text { font-size:.86rem; }
+  .ci-sub { font-size:.7rem; color:var(--muted); font-family:'Space Mono',monospace; margin-top:.1rem; }
 
-  footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: 'Space Mono', monospace; font-size: .72rem; color: var(--muted); }
-  footer strong { color: var(--accent); }
+  footer { position:relative; z-index:1; border-top:1px solid var(--border); padding:1.8rem 2rem; text-align:center; font-family:'Space Mono',monospace; font-size:.7rem; color:var(--muted); }
+  footer strong { color:var(--accent); }
 
   @keyframes fd { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
-  @media (max-width: 640px) { .nav-links{display:none} .build-step{grid-template-columns:44px 1fr;gap:1rem} .blocks-row{gap:.35rem} }
+  @media (max-width:700px) { .nav-links{display:none} .build-step{grid-template-columns:42px 1fr;gap:1rem} .blocks-row{gap:.3rem} }
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
   <a class="nav-logo" href="#">
     <div class="brick"><span></span><span></span></div>
-    EV3 DRIVING BASE
+    EV3 DOCS
   </a>
   <ul class="nav-links">
     <li><a href="#team">Team</a></li>
@@ -182,547 +207,525 @@
     <li><a href="#reflection">Reflection</a></li>
     <li><a href="#checklist">Checklist</a></li>
   </ul>
-  <span class="nav-pill">EV3 CLASSROOM</span>
+  <div class="proj-switcher">
+    <button class="proj-btn active" onclick="switchProject('p1', this)">01 · Driving Base</button>
+    <button class="proj-btn" onclick="switchProject('p2', this)">02 · Color Sorter</button>
+  </div>
 </nav>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-chip"><span class="dot"></span>EV3 Classroom · Student-Driven Project</div>
-  <h1>The <span class="hl">Driving</span><br>Base</h1>
-  <p class="hero-sub">Build, program, and document an EV3 two-wheel driving base using EV3 Classroom's stock block programs. Every decision you make is part of the project.</p>
-  <div class="hero-stats">
-    <div class="stat"><div class="stat-val">2</div><div class="stat-lbl">Large Motors</div></div>
-    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Coding Tasks</div></div>
-    <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Team Members</div></div>
-    <div class="stat"><div class="stat-val">1</div><div class="stat-lbl">EV3 Brick</div></div>
-  </div>
-  <div class="robot-wrap">
-    <svg class="robot-svg" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="55" y="50" width="130" height="80" rx="10" fill="#1c2130" stroke="#f5c842" stroke-width="2"/>
-      <rect x="70" y="60" width="100" height="60" rx="7" fill="#141720" stroke="#252b3b" stroke-width="1.5"/>
-      <rect x="80" y="67" width="55" height="34" rx="4" fill="#0a2a1f"/>
-      <rect x="85" y="72" width="45" height="24" rx="3" fill="#0d3a28"/>
-      <rect x="89" y="76" width="25" height="3" rx="1.5" fill="#3de8b0" opacity=".9"/>
-      <rect x="89" y="82" width="37" height="3" rx="1.5" fill="#3de8b0" opacity=".55"/>
-      <rect x="89" y="88" width="18" height="3" rx="1.5" fill="#3de8b0" opacity=".3"/>
-      <circle cx="148" cy="76" r="7" fill="#252b3b" stroke="#f5c842" stroke-width="1.5"/>
-      <circle cx="148" cy="76" r="3" fill="#f5c842"/>
-      <rect x="142" y="88" width="12" height="5" rx="2.5" fill="#252b3b" stroke="#3de8b0" stroke-width="1"/>
-      <rect x="142" y="96" width="12" height="5" rx="2.5" fill="#252b3b" stroke="#3de8b0" stroke-width="1"/>
-      <rect x="80" y="125" width="10" height="6" rx="2" fill="#3de8b0" opacity=".7"/>
-      <rect x="95" y="125" width="10" height="6" rx="2" fill="#3de8b0" opacity=".7"/>
-      <rect x="130" y="125" width="10" height="6" rx="2" fill="#f5c842" opacity=".7"/>
-      <rect x="145" y="125" width="10" height="6" rx="2" fill="#f5c842" opacity=".7"/>
-      <text x="83" y="135" fill="#7a8099" font-size="5" font-family="monospace">B  C</text>
-      <text x="132" y="135" fill="#7a8099" font-size="5" font-family="monospace">1  2</text>
-      <ellipse cx="55" cy="105" rx="16" ry="38" fill="#141720" stroke="#f5c842" stroke-width="2"/>
-      <ellipse cx="55" cy="105" rx="8" ry="30" fill="#1c2130"/>
-      <circle cx="55" cy="90" r="5" fill="#f5c842" opacity=".4"/>
-      <circle cx="55" cy="105" r="5" fill="#f5c842" opacity=".4"/>
-      <circle cx="55" cy="120" r="5" fill="#f5c842" opacity=".4"/>
-      <ellipse cx="185" cy="105" rx="16" ry="38" fill="#141720" stroke="#f5c842" stroke-width="2"/>
-      <ellipse cx="185" cy="105" rx="8" ry="30" fill="#1c2130"/>
-      <circle cx="185" cy="90" r="5" fill="#f5c842" opacity=".4"/>
-      <circle cx="185" cy="105" r="5" fill="#f5c842" opacity=".4"/>
-      <circle cx="185" cy="120" r="5" fill="#f5c842" opacity=".4"/>
-      <line x1="55" y1="100" x2="70" y2="100" stroke="#f5c842" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="170" y1="100" x2="185" y2="100" stroke="#f5c842" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="120" cy="138" r="10" fill="#141720" stroke="#f5c842" stroke-width="1.5"/>
-      <circle cx="120" cy="138" r="4" fill="#f5c842" opacity=".5"/>
-    </svg>
-  </div>
-</div>
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PROJECT 1: DRIVING BASE                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="p1" class="project-page active">
 
-<!-- TEAM -->
-<section id="team" class="alt">
-  <div class="section-inner">
-    <div class="section-label">👥 Our Team</div>
-    <h2 class="section-title">Meet the Team</h2>
-    <p class="section-sub">Five students, one robot. Everyone contributes to building, programming, testing, and documentation.</p>
-    <div class="team-grid">
-      <div class="team-card">
-        <div class="team-avatar" style="background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);">🤖</div>
-        <div class="team-name">Itaru</div>
-        <div class="team-role">BUILD LEAD</div>
-        <span class="team-status ts-active">● ACTIVE</span>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:rgba(61,232,176,.1);border-color:rgba(61,232,176,.3);">💻</div>
-        <div class="team-name">Yuga</div>
-        <div class="team-role">PROGRAMMER</div>
-        <span class="team-status ts-building">● BUILDING</span>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:rgba(91,192,245,.1);border-color:rgba(91,192,245,.3);">🧪</div>
-        <div class="team-name">Tintin</div>
-        <div class="team-role">TESTER</div>
-        <span class="team-status ts-testing">● TESTING</span>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:rgba(255,148,96,.1);border-color:rgba(255,148,96,.3);">📐</div>
-        <div class="team-name">Chris</div>
-        <div class="team-role">DESIGNER</div>
-        <span class="team-status ts-active">● ACTIVE</span>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:rgba(187,134,252,.1);border-color:rgba(187,134,252,.3);">📝</div>
-        <div class="team-name">Caleb</div>
-        <div class="team-role">DOCUMENTER</div>
-        <span class="team-status ts-building">● BUILDING</span>
-      </div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-chip"><span class="dot"></span>Project 01 · EV3 Classroom · Driving Base</div>
+    <h1>The <span class="hl">Driving</span><br>Base</h1>
+    <p class="hero-sub">Build, program, and document an EV3 two-wheel driving base using EV3 Classroom's stock block programs. Every decision you make is part of the project.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-val">2</div><div class="stat-lbl">Large Motors</div></div>
+      <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Coding Tasks</div></div>
+      <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Team Members</div></div>
+      <div class="stat"><div class="stat-val">1</div><div class="stat-lbl">EV3 Brick</div></div>
+    </div>
+    <div class="robot-wrap">
+      <svg class="robot-svg" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="55" y="50" width="130" height="80" rx="10" fill="#1c2130" stroke="#f5c842" stroke-width="2"/>
+        <rect x="70" y="60" width="100" height="60" rx="7" fill="#141720" stroke="#252b3b" stroke-width="1.5"/>
+        <rect x="80" y="67" width="55" height="34" rx="4" fill="#0a2a1f"/>
+        <rect x="85" y="72" width="45" height="24" rx="3" fill="#0d3a28"/>
+        <rect x="89" y="76" width="25" height="3" rx="1.5" fill="#3de8b0" opacity=".9"/>
+        <rect x="89" y="82" width="37" height="3" rx="1.5" fill="#3de8b0" opacity=".55"/>
+        <rect x="89" y="88" width="18" height="3" rx="1.5" fill="#3de8b0" opacity=".3"/>
+        <circle cx="148" cy="76" r="7" fill="#252b3b" stroke="#f5c842" stroke-width="1.5"/>
+        <circle cx="148" cy="76" r="3" fill="#f5c842"/>
+        <rect x="142" y="88" width="12" height="5" rx="2.5" fill="#252b3b" stroke="#3de8b0" stroke-width="1"/>
+        <rect x="142" y="96" width="12" height="5" rx="2.5" fill="#252b3b" stroke="#3de8b0" stroke-width="1"/>
+        <rect x="80" y="125" width="10" height="6" rx="2" fill="#3de8b0" opacity=".7"/>
+        <rect x="95" y="125" width="10" height="6" rx="2" fill="#3de8b0" opacity=".7"/>
+        <rect x="130" y="125" width="10" height="6" rx="2" fill="#f5c842" opacity=".7"/>
+        <rect x="145" y="125" width="10" height="6" rx="2" fill="#f5c842" opacity=".7"/>
+        <text x="83" y="135" fill="#7a8099" font-size="5" font-family="monospace">B  C</text>
+        <text x="132" y="135" fill="#7a8099" font-size="5" font-family="monospace">1  2</text>
+        <ellipse cx="55" cy="105" rx="16" ry="38" fill="#141720" stroke="#f5c842" stroke-width="2"/>
+        <ellipse cx="55" cy="105" rx="8" ry="30" fill="#1c2130"/>
+        <circle cx="55" cy="90" r="5" fill="#f5c842" opacity=".4"/>
+        <circle cx="55" cy="105" r="5" fill="#f5c842" opacity=".4"/>
+        <circle cx="55" cy="120" r="5" fill="#f5c842" opacity=".4"/>
+        <ellipse cx="185" cy="105" rx="16" ry="38" fill="#141720" stroke="#f5c842" stroke-width="2"/>
+        <ellipse cx="185" cy="105" rx="8" ry="30" fill="#1c2130"/>
+        <circle cx="185" cy="90" r="5" fill="#f5c842" opacity=".4"/>
+        <circle cx="185" cy="105" r="5" fill="#f5c842" opacity=".4"/>
+        <circle cx="185" cy="120" r="5" fill="#f5c842" opacity=".4"/>
+        <line x1="55" y1="100" x2="70" y2="100" stroke="#f5c842" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="170" y1="100" x2="185" y2="100" stroke="#f5c842" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="120" cy="138" r="10" fill="#141720" stroke="#f5c842" stroke-width="1.5"/>
+        <circle cx="120" cy="138" r="4" fill="#f5c842" opacity=".5"/>
+      </svg>
     </div>
   </div>
-</section>
 
-<!-- OVERVIEW -->
-<section id="overview">
-  <div class="section-inner">
-    <div class="section-label">📋 Overview</div>
-    <h2 class="section-title">Project Overview</h2>
-    <p class="section-sub">The EV3 Driving Base is a two-motor robot controlled through EV3 Classroom's ready-made programs. You'll build it, run the stock programs, observe and record results.</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.2rem;">
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;">
-        <div style="font-size:1.3rem;margin-bottom:.7rem;">🎯</div>
-        <div style="font-weight:700;margin-bottom:.5rem;">Learning Objectives</div>
-        <div style="font-size:.85rem;color:var(--muted);line-height:1.75;">Understand how a two-motor differential drive works. Use EV3 Classroom's stock movement blocks. Observe how settings like speed and distance affect robot behaviour. Record and reflect on your results.</div>
+  <!-- TEAM -->
+  <section id="team" class="alt">
+    <div class="section-inner">
+      <div class="section-label">👥 Our Team</div>
+      <h2 class="section-title">Meet the Team</h2>
+      <p class="section-sub">Five students, one robot. Everyone contributes to building, programming, testing, and documentation.</p>
+      <div class="team-grid">
+        <div class="team-card"><div class="team-avatar" style="background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);">🤖</div><div class="team-name">Itaru</div><div class="team-role">BUILD LEAD</div><span class="team-status ts-active">● ACTIVE</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(61,232,176,.1);border-color:rgba(61,232,176,.3);">💻</div><div class="team-name">Yuga</div><div class="team-role">PROGRAMMER</div><span class="team-status ts-building">● BUILDING</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(91,192,245,.1);border-color:rgba(91,192,245,.3);">🧪</div><div class="team-name">Tintin</div><div class="team-role">TESTER</div><span class="team-status ts-testing">● TESTING</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(255,148,96,.1);border-color:rgba(255,148,96,.3);">📐</div><div class="team-name">Chris</div><div class="team-role">DESIGNER</div><span class="team-status ts-active">● ACTIVE</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(187,134,252,.1);border-color:rgba(187,134,252,.3);">📝</div><div class="team-name">Caleb</div><div class="team-role">DOCUMENTER</div><span class="team-status ts-building">● BUILDING</span></div>
       </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;">
-        <div style="font-size:1.3rem;margin-bottom:.7rem;">⚙️</div>
-        <div style="font-weight:700;margin-bottom:.5rem;">How It Steers</div>
-        <div style="font-size:.85rem;color:var(--muted);line-height:1.75;">Two large motors — one per wheel — run independently. EV3 Classroom's <strong style="color:var(--text);">Move Steering</strong> block controls both at once. Steering value 0 = straight; negative = left; positive = right.</div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-inner">
+      <div class="section-label">📋 Overview</div>
+      <h2 class="section-title">Project Overview</h2>
+      <p class="section-sub">The EV3 Driving Base is a two-motor robot controlled through EV3 Classroom's ready-made programs. You'll build it, run the stock programs, observe and record results.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.1rem;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">🎯</div><div style="font-weight:700;margin-bottom:.45rem;">Learning Objectives</div><div style="font-size:.83rem;color:var(--muted);line-height:1.75;">Understand how a two-motor differential drive works. Use EV3 Classroom's stock movement blocks. Observe how speed and distance settings affect robot behaviour.</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">⚙️</div><div style="font-weight:700;margin-bottom:.45rem;">How It Steers</div><div style="font-size:.83rem;color:var(--muted);line-height:1.75;">Two large motors — one per wheel — run independently. EV3 Classroom's <strong style="color:var(--text);">Move Steering</strong> block controls both at once. Steering 0 = straight; negative = left; positive = right.</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">📦</div><div style="font-weight:700;margin-bottom:.45rem;">Stock Programs</div><div style="font-size:.83rem;color:var(--muted);line-height:1.75;">EV3 Classroom includes pre-built programs in the <strong style="color:var(--text);">Driving Base</strong> unit. Use these as your starting point, adjust settings, and document what changes.</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">📝</div><div style="font-weight:700;margin-bottom:.45rem;">Student-Driven</div><div style="font-size:.83rem;color:var(--muted);line-height:1.75;">You decide what settings to try. No single correct answer — experiment, measure each result, and write down what you notice.</div></div>
       </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;">
-        <div style="font-size:1.3rem;margin-bottom:.7rem;">📦</div>
-        <div style="font-weight:700;margin-bottom:.5rem;">Stock Programs</div>
-        <div style="font-size:.85rem;color:var(--muted);line-height:1.75;">EV3 Classroom comes with pre-built driving programs in the <strong style="color:var(--text);">Driving Base</strong> unit. You will use these as your starting point, adjust settings, and document what changes.</div>
+    </div>
+  </section>
+
+  <!-- PARTS -->
+  <section id="parts" class="alt">
+    <div class="section-inner">
+      <div class="section-label">🧩 Materials</div>
+      <h2 class="section-title">Parts List</h2>
+      <p class="section-sub">Check every item against your EV3 kit before you start building.</p>
+      <div class="parts-grid">
+        <div class="part-card"><div class="part-icon">🧠</div><div><div class="part-name">EV3 Intelligent Brick</div><div class="part-detail">The brain — runs EV3 Classroom programs</div></div><div class="part-qty">×1</div></div>
+        <div class="part-card"><div class="part-icon">⚙️</div><div><div class="part-name">Large Servo Motor</div><div class="part-detail">Port B (left) · Port C (right)</div></div><div class="part-qty">×2</div></div>
+        <div class="part-card"><div class="part-icon">⭕</div><div><div class="part-name">Large Traction Wheel</div><div class="part-detail">Standard EV3 driving wheel</div></div><div class="part-qty">×2</div></div>
+        <div class="part-card"><div class="part-icon">🔵</div><div><div class="part-name">Small Caster Wheel</div><div class="part-detail">Front or rear balance wheel</div></div><div class="part-qty">×1</div></div>
+        <div class="part-card"><div class="part-icon">🔲</div><div><div class="part-name">Technic Beam Frame</div><div class="part-detail">Beams to form the chassis</div></div><div class="part-qty">varies</div></div>
+        <div class="part-card"><div class="part-icon">🔩</div><div><div class="part-name">Axles, Pins & Bushings</div><div class="part-detail">Connectors and cross-axles</div></div><div class="part-qty">varies</div></div>
+        <div class="part-card"><div class="part-icon">🔌</div><div><div class="part-name">Motor Cables</div><div class="part-detail">Black EV3 connector cables</div></div><div class="part-qty">×2</div></div>
+        <div class="part-card"><div class="part-icon">🔋</div><div><div class="part-name">Batteries / Power Pack</div><div class="part-detail">6× AA or EV3 rechargeable pack</div></div><div class="part-qty">×1</div></div>
+        <div class="part-card"><div class="part-icon">💻</div><div><div class="part-name">EV3 Classroom App</div><div class="part-detail">Installed on tablet or computer</div></div><div class="part-qty">×1</div></div>
       </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;">
-        <div style="font-size:1.3rem;margin-bottom:.7rem;">📝</div>
-        <div style="font-weight:700;margin-bottom:.5rem;">Student-Driven</div>
-        <div style="font-size:.85rem;color:var(--muted);line-height:1.75;">You decide what settings to try and how to tune them. There's no single correct answer — experiment, measure each result, and write down what you notice.</div>
+    </div>
+  </section>
+
+  <!-- BUILD -->
+  <section id="build" class="alt2">
+    <div class="section-inner">
+      <div class="section-label">🔧 Build Guide</div>
+      <h2 class="section-title">Build Steps</h2>
+      <p class="section-sub">Work through each step in order. Take photos after each stage for your documentation.</p>
+      <div class="build-step"><div class="bs-num">01</div><div><div class="bs-title">Plan Your Layout</div><div class="bs-desc">Sketch a top-down view of your robot before touching any pieces. Decide where the brick, motors, and wheels go. The centre of gravity should sit between the two drive wheels.</div><div class="bs-tip">💡 Keep it compact and low. The sketch counts as part of your documentation.</div></div></div>
+      <div class="build-step"><div class="bs-num">02</div><div><div class="bs-title">Mount Both Large Motors</div><div class="bs-desc">Attach the two large servo motors symmetrically on opposite sides of the chassis. Both output shafts must be on the same horizontal axis or the robot will drift when driving straight.</div><div class="bs-tip">💡 Use a beam across both motors to lock them at the same height. Uneven motors = uncontrollable drift.</div></div></div>
+      <div class="build-step"><div class="bs-num">03</div><div><div class="bs-title">Attach the Drive Wheels</div><div class="bs-desc">Press the large traction wheels onto the motor axles and lock them with a bushing. Both wheels must be the same size and fully seated.</div><div class="bs-tip">💡 Check that both wheels spin freely by hand before moving on.</div></div></div>
+      <div class="build-step"><div class="bs-num">04</div><div><div class="bs-title">Add the Caster Wheel</div><div class="bs-desc">Mount a small caster at the front or rear. It must touch the ground evenly and let the robot pivot freely. Use spacers to match the height of the drive wheels.</div><div class="bs-tip">💡 If the robot tips forward or backward, adjust the caster height first.</div></div></div>
+      <div class="build-step"><div class="bs-num">05</div><div><div class="bs-title">Mount the EV3 Brick</div><div class="bs-desc">Secure the EV3 brick so the screen faces up and motor ports B and C are accessible. Centre it between the wheels to keep weight balanced.</div><div class="bs-tip">💡 The brick is the heaviest part. Off-centre placement causes drift that programming can't fix.</div></div></div>
+      <div class="build-step"><div class="bs-num">06</div><div><div class="bs-title">Connect Motor Cables</div><div class="bs-desc">Plug the left motor into Port B and the right motor into Port C. Route cables so they cannot catch in the wheels.</div><div class="bs-tip">💡 EV3 Classroom stock programs expect B = left, C = right. Swapping makes turns go the wrong way.</div></div></div>
+      <div class="build-step"><div class="bs-num">07</div><div><div class="bs-title">Manual Roll Test</div><div class="bs-desc">Push the robot by hand on a flat surface. It should roll straight. If it drifts, fix the mechanical issue now — no program can correct a physical misalignment.</div><div class="bs-tip">💡 Document anything you adjusted here. It's part of your engineering process.</div></div></div>
+    </div>
+  </section>
+
+  <!-- PROGRAMMING -->
+  <section id="programming">
+    <div class="section-inner">
+      <div class="section-label">💻 Programming</div>
+      <h2 class="section-title">Coding Challenges</h2>
+      <p class="section-sub">All programs use the stock blocks from EV3 Classroom. Open the app, find the Driving Base unit, and follow each task.</p>
+      <div class="stock-intro"><div class="stock-intro-icon">📦</div><div class="stock-intro-text"><strong>Using EV3 Classroom stock programs.</strong> You are not writing code from scratch. Open each program, adjust the settings shown, run it, and record what happens.</div></div>
+
+      <div class="task-block">
+        <div class="task-header"><div class="task-num">01</div><div class="task-title">Move Forward — Timed</div><span class="task-badge tb-beg">STARTER</span></div>
+        <div class="task-body">
+          <div class="task-goal">Open the Move Forward stock program. Run it and observe. This confirms your motor ports are correct and the robot drives straight.</div>
+          <div class="block-visual"><div class="bv-label">BLOCK SEQUENCE</div><div class="blocks-row"><div class="ev3-block block-green"><div class="block-name">START</div></div><div class="block-arrow">→</div><div class="ev3-block block-blue"><div class="block-name">Move Steering</div><div class="block-val">Steering: 0 | Speed: 50%</div><div class="block-val">Duration: 3 seconds</div></div><div class="block-arrow">→</div><div class="ev3-block block-red"><div class="block-name">Stop</div></div></div></div>
+          <div class="settings-grid"><div class="setting-row"><span class="setting-key">Steering</span><span class="setting-val">0</span></div><div class="setting-row"><span class="setting-key">Speed</span><span class="setting-val">50%</span></div><div class="setting-row"><span class="setting-key">Duration</span><span class="setting-val">3 seconds</span></div><div class="setting-row"><span class="setting-key">Ports</span><span class="setting-val">B + C</span></div></div>
+          <div class="doc-prompt"><strong>📝 Document:</strong><br><span>Did it go straight? Try speed 30% then 75% — what changed? Write down each result.</span></div>
+        </div>
       </div>
+
+      <div class="task-block">
+        <div class="task-header"><div class="task-num">02</div><div class="task-title">Move a Set Distance</div><span class="task-badge tb-int">CORE TASK</span></div>
+        <div class="task-body">
+          <div class="task-goal">Use the stock program to drive exactly 1 metre using rotations. Adjust the rotations value until you reach the target as accurately as possible.</div>
+          <div class="block-visual"><div class="bv-label">BLOCK SEQUENCE</div><div class="blocks-row"><div class="ev3-block block-green"><div class="block-name">START</div></div><div class="block-arrow">→</div><div class="ev3-block block-blue"><div class="block-name">Move Steering</div><div class="block-val">Steering: 0 | Speed: 50%</div><div class="block-val">Rotations: ? (you decide)</div></div><div class="block-arrow">→</div><div class="ev3-block block-red"><div class="block-name">Stop</div></div></div></div>
+          <div class="settings-grid"><div class="setting-row"><span class="setting-key">Steering</span><span class="setting-val">0</span></div><div class="setting-row"><span class="setting-key">Speed</span><span class="setting-val">50%</span></div><div class="setting-row"><span class="setting-key">Unit</span><span class="setting-val">Rotations</span></div><div class="setting-row"><span class="setting-key">Target</span><span class="setting-val">1 metre</span></div></div>
+          <div class="doc-prompt"><strong>📝 Document:</strong><br><span>What rotation value did you start with? How far did it actually go? How many tries to hit 1 metre? What was your closest result?</span></div>
+        </div>
+      </div>
+
+      <div class="task-block">
+        <div class="task-header"><div class="task-num">03</div><div class="task-title">Turn Left and Right</div><span class="task-badge tb-int">CORE TASK</span></div>
+        <div class="task-body">
+          <div class="task-goal">Adjust the Steering value to make the robot turn approximately 90° left, then 90° right. Tune steering and duration to get close.</div>
+          <div class="block-visual"><div class="bv-label">BLOCK SEQUENCE</div><div class="blocks-row"><div class="ev3-block block-green"><div class="block-name">START</div></div><div class="block-arrow">→</div><div class="ev3-block block-blue"><div class="block-name">Move Steering</div><div class="block-val">Steering: -100</div><div class="block-val">Duration: ? seconds</div></div><div class="block-arrow">→</div><div class="ev3-block block-orange"><div class="block-name">Wait</div><div class="block-val">0.5 seconds</div></div><div class="block-arrow">→</div><div class="ev3-block block-blue"><div class="block-name">Move Steering</div><div class="block-val">Steering: +100</div><div class="block-val">Duration: ? seconds</div></div><div class="block-arrow">→</div><div class="ev3-block block-red"><div class="block-name">Stop</div></div></div></div>
+          <div class="settings-grid"><div class="setting-row"><span class="setting-key">Left Turn</span><span class="setting-val">Steering: -100</span></div><div class="setting-row"><span class="setting-key">Right Turn</span><span class="setting-val">Steering: +100</span></div><div class="setting-row"><span class="setting-key">Speed</span><span class="setting-val">50%</span></div><div class="setting-row"><span class="setting-key">Duration</span><span class="setting-val">you decide</span></div></div>
+          <div class="doc-prompt"><strong>📝 Document:</strong><br><span>What duration gave you closest to 90°? Did left and right need the same value? What happened with Steering: -50?</span></div>
+        </div>
+      </div>
+
+      <div class="task-block">
+        <div class="task-header"><div class="task-num">04</div><div class="task-title">Drive a Square Path</div><span class="task-badge tb-adv">CHALLENGE</span></div>
+        <div class="task-body">
+          <div class="task-goal">Combine straight driving and turning into one program using a Loop block set to 4. The robot should return close to its starting position.</div>
+          <div class="block-visual"><div class="bv-label">BLOCK SEQUENCE</div><div class="blocks-row"><div class="ev3-block block-green"><div class="block-name">START</div></div><div class="block-arrow">→</div><div class="ev3-block block-yellow"><div class="block-name">Loop</div><div class="block-val">Count: 4</div></div><div class="block-arrow">→</div><div class="ev3-block block-blue"><div class="block-name">Move Steering</div><div class="block-val">Steer: 0 (straight)</div><div class="block-val">Your rotations</div></div><div class="block-arrow">→</div><div class="ev3-block block-blue"><div class="block-name">Move Steering</div><div class="block-val">Steer: -100 (turn)</div><div class="block-val">Your duration</div></div><div class="block-arrow">→</div><div class="ev3-block block-red"><div class="block-name">Stop</div></div></div></div>
+          <div class="settings-grid"><div class="setting-row"><span class="setting-key">Loop Count</span><span class="setting-val">4 times</span></div><div class="setting-row"><span class="setting-key">Straight</span><span class="setting-val">your value</span></div><div class="setting-row"><span class="setting-key">Turn</span><span class="setting-val">your value</span></div><div class="setting-row"><span class="setting-key">Target</span><span class="setting-val">back to start</span></div></div>
+          <div class="doc-prompt"><strong>📝 Document:</strong><br><span>Did it return to start? Did the gap grow with each loop? How many test runs to get close? What values worked best?</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFLECTION P1 -->
+  <section id="reflection" class="alt2">
+    <div class="section-inner">
+      <div class="section-label">💬 Reflection</div>
+      <h2 class="section-title">Student Reflection</h2>
+      <p class="section-sub">Each team member should answer these individually. Answers save automatically.</p>
+      <div class="reflection-grid">
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q1</span>What was the hardest part of building the driving base?</div><textarea class="reflect-area p1-reflect" placeholder="Describe a specific problem and how you solved it..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q2</span>How many tries to drive 1 metre accurately? What did you change each time?</div><textarea class="reflect-area p1-reflect" placeholder="List your rotation values and actual distances measured..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q3</span>What does the Steering value actually control? Explain in your own words.</div><textarea class="reflect-area p1-reflect" placeholder="Based on what you observed when running the program..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q4</span>Did the square path error grow after each turn? Why?</div><textarea class="reflect-area p1-reflect" placeholder="Think about what a small error does when repeated 4 times..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q5</span>What would you change about the physical build if you started again?</div><textarea class="reflect-area p1-reflect" placeholder="Think about weight, wheel placement, cable routing..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q6</span>What's one thing your team worked really well on together?</div><textarea class="reflect-area p1-reflect" placeholder="Communication, problem-solving, dividing tasks..."></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST P1 -->
+  <section id="checklist">
+    <div class="section-inner">
+      <div class="section-label">✅ Completion</div>
+      <h2 class="section-title">Project Checklist</h2>
+      <p class="section-sub">Click each item to check it off. Progress saves automatically.</p>
+      <div class="pb-label"><span>Overall Progress</span><span id="p1-progress-count">0 / 13</span></div>
+      <div class="pb"><div class="pb-fill" id="p1-pb-fill" style="width:0%"></div></div>
+      <div class="checklist" id="p1-checklist">
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">All parts gathered and checked</div><div class="ci-sub">Prep</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Robot design sketched on paper before building</div><div class="ci-sub">Build · Step 01</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Both motors mounted symmetrically</div><div class="ci-sub">Build · Step 02</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Drive wheels and caster attached and level</div><div class="ci-sub">Build · Step 03–04</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">EV3 brick mounted, cables in Port B and C</div><div class="ci-sub">Build · Step 05–06</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Manual roll test passed</div><div class="ci-sub">Build · Step 07</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Task 1: Move Forward run and results recorded</div><div class="ci-sub">Programming · Task 01</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Task 2: 1-metre distance achieved and documented</div><div class="ci-sub">Programming · Task 02</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Task 3: Left and right 90° turns tested</div><div class="ci-sub">Programming · Task 03</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Task 4: Square path completed using Loop block</div><div class="ci-sub">Programming · Task 04</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">All 6 reflection questions answered</div><div class="ci-sub">Reflection</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Photos taken at each build stage</div><div class="ci-sub">Documentation</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p1')"><div class="cb"></div><div><div class="ci-text">Results table filled in for all tasks</div><div class="ci-sub">Documentation</div></div></div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /project 1 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PROJECT 2: COLOR SENSOR SORTER                             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="p2" class="project-page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-glow hero-glow-color"></div>
+    <div class="hero-chip" style="color:var(--accent);"><span class="dot" style="background:var(--accent);"></span>Project 02 · EV3 Classroom · Color Sensor</div>
+    <h1>Color Sensor<br><span class="hl2">Sorting</span></h1>
+    <p class="hero-sub">Use the EV3 color sensor and EV3 Classroom's stock programs to detect colors and trigger different robot actions. Observe, tune, and document everything.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-val stat-val2">1</div><div class="stat-lbl">Color Sensor</div></div>
+      <div class="stat"><div class="stat-val stat-val2">3</div><div class="stat-lbl">Coding Tasks</div></div>
+      <div class="stat"><div class="stat-val stat-val2">5</div><div class="stat-lbl">Team Members</div></div>
+      <div class="stat"><div class="stat-val stat-val2">4</div><div class="stat-lbl">Colors Detected</div></div>
+    </div>
+    <div class="robot-wrap">
+      <!-- Color sensor robot SVG -->
+      <svg class="sensor-svg" viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body -->
+        <rect x="60" y="55" width="120" height="85" rx="10" fill="#1c2130" stroke="#3de8b0" stroke-width="2"/>
+        <!-- Screen -->
+        <rect x="75" y="65" width="90" height="50" rx="6" fill="#141720" stroke="#252b3b" stroke-width="1.5"/>
+        <rect x="82" y="71" width="50" height="30" rx="4" fill="#0a1f3a"/>
+        <!-- Color display on screen -->
+        <circle cx="107" cy="86" r="12" fill="#3de8b0" opacity=".8"/>
+        <circle cx="107" cy="86" r="6" fill="#0d3a28"/>
+        <!-- Screen label -->
+        <text x="140" y="83" fill="#5bc0f5" font-size="5" font-family="monospace">COLOR</text>
+        <text x="140" y="91" fill="#3de8b0" font-size="6" font-family="monospace" font-weight="bold">GREEN</text>
+        <!-- Buttons -->
+        <circle cx="140" cy="104" r="6" fill="#252b3b" stroke="#3de8b0" stroke-width="1.5"/>
+        <circle cx="153" cy="104" r="6" fill="#3de8b0"/>
+        <!-- Port labels -->
+        <rect x="75" y="135" width="10" height="5" rx="2" fill="#3de8b0" opacity=".7"/>
+        <rect x="90" y="135" width="10" height="5" rx="2" fill="#f5c842" opacity=".7"/>
+        <text x="78" y="144" fill="#7a8099" font-size="5" font-family="monospace">1</text>
+        <text x="93" y="144" fill="#7a8099" font-size="5" font-family="monospace">B</text>
+        <!-- Color sensor arm pointing down -->
+        <rect x="105" y="140" width="30" height="12" rx="4" fill="#1c2130" stroke="#3de8b0" stroke-width="1.5"/>
+        <circle cx="120" cy="146" r="5" fill="#3de8b0" opacity=".9"/>
+        <circle cx="120" cy="146" r="2" fill="#0d0f14"/>
+        <!-- Sensor beam -->
+        <line x1="120" y1="152" x2="120" y2="165" stroke="#3de8b0" stroke-width="1.5" stroke-dasharray="3,2" opacity=".6"/>
+        <!-- Color strip on floor -->
+        <rect x="90" y="167" width="15" height="8" rx="2" fill="#ff5f5f" opacity=".8"/>
+        <rect x="107" y="167" width="15" height="8" rx="2" fill="#3de8b0" opacity=".8"/>
+        <rect x="124" y="167" width="15" height="8" rx="2" fill="#f5c842" opacity=".8"/>
+        <!-- Wheels -->
+        <ellipse cx="60" cy="110" rx="14" ry="34" fill="#141720" stroke="#3de8b0" stroke-width="1.5"/>
+        <ellipse cx="60" cy="110" rx="7" ry="26" fill="#1c2130"/>
+        <ellipse cx="180" cy="110" rx="14" ry="34" fill="#141720" stroke="#3de8b0" stroke-width="1.5"/>
+        <ellipse cx="180" cy="110" rx="7" ry="26" fill="#1c2130"/>
+        <line x1="60" y1="106" x2="74" y2="106" stroke="#3de8b0" stroke-width="2" stroke-linecap="round"/>
+        <line x1="166" y1="106" x2="180" y2="106" stroke="#3de8b0" stroke-width="2" stroke-linecap="round"/>
+      </svg>
     </div>
   </div>
-</section>
 
-<!-- PARTS -->
-<section id="parts" class="alt">
-  <div class="section-inner">
-    <div class="section-label">🧩 Materials</div>
-    <h2 class="section-title">Parts List</h2>
-    <p class="section-sub">Check every item against your EV3 kit before you start building.</p>
-    <div class="parts-grid">
-      <div class="part-card"><div class="part-icon">🧠</div><div><div class="part-name">EV3 Intelligent Brick</div><div class="part-detail">The brain — runs EV3 Classroom programs</div></div><div class="part-qty">×1</div></div>
-      <div class="part-card"><div class="part-icon">⚙️</div><div><div class="part-name">Large Servo Motor</div><div class="part-detail">Port B (left) · Port C (right)</div></div><div class="part-qty">×2</div></div>
-      <div class="part-card"><div class="part-icon">⭕</div><div><div class="part-name">Large Traction Wheel</div><div class="part-detail">Standard EV3 driving wheel</div></div><div class="part-qty">×2</div></div>
-      <div class="part-card"><div class="part-icon">🔵</div><div><div class="part-name">Small Caster Wheel</div><div class="part-detail">Front or rear balance wheel</div></div><div class="part-qty">×1</div></div>
-      <div class="part-card"><div class="part-icon">🔲</div><div><div class="part-name">Technic Beam Frame</div><div class="part-detail">Beams to form the chassis</div></div><div class="part-qty">varies</div></div>
-      <div class="part-card"><div class="part-icon">🔩</div><div><div class="part-name">Axles, Pins & Bushings</div><div class="part-detail">Connectors and cross-axles</div></div><div class="part-qty">varies</div></div>
-      <div class="part-card"><div class="part-icon">🔌</div><div><div class="part-name">Motor Cables</div><div class="part-detail">Black EV3 connector cables</div></div><div class="part-qty">×2</div></div>
-      <div class="part-card"><div class="part-icon">🔋</div><div><div class="part-name">Batteries / Power Pack</div><div class="part-detail">6× AA or EV3 rechargeable pack</div></div><div class="part-qty">×1</div></div>
-      <div class="part-card"><div class="part-icon">💻</div><div><div class="part-name">EV3 Classroom App</div><div class="part-detail">Installed on tablet or computer</div></div><div class="part-qty">×1</div></div>
+  <!-- TEAM -->
+  <section class="alt">
+    <div class="section-inner">
+      <div class="section-label section-label2">👥 Our Team</div>
+      <h2 class="section-title">Meet the Team</h2>
+      <p class="section-sub">Same five students, new challenge. Roles may shift between projects.</p>
+      <div class="team-grid">
+        <div class="team-card"><div class="team-avatar" style="background:rgba(61,232,176,.1);border-color:rgba(61,232,176,.3);">🤖</div><div class="team-name">Itaru</div><div class="team-role">BUILD LEAD</div><span class="team-status ts-active">● ACTIVE</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);">💻</div><div class="team-name">Yuga</div><div class="team-role">PROGRAMMER</div><span class="team-status ts-building">● BUILDING</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(91,192,245,.1);border-color:rgba(91,192,245,.3);">🧪</div><div class="team-name">Tintin</div><div class="team-role">TESTER</div><span class="team-status ts-testing">● TESTING</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(255,148,96,.1);border-color:rgba(255,148,96,.3);">📐</div><div class="team-name">Chris</div><div class="team-role">DESIGNER</div><span class="team-status ts-active">● ACTIVE</span></div>
+        <div class="team-card"><div class="team-avatar" style="background:rgba(187,134,252,.1);border-color:rgba(187,134,252,.3);">📝</div><div class="team-name">Caleb</div><div class="team-role">DOCUMENTER</div><span class="team-status ts-building">● BUILDING</span></div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- BUILD -->
-<section id="build" class="alt2">
-  <div class="section-inner">
-    <div class="section-label">🔧 Build Guide</div>
-    <h2 class="section-title">Build Steps</h2>
-    <p class="section-sub">Work through each step in order. Take photos after each stage — these are part of your documentation.</p>
-
-    <div class="build-step">
-      <div class="bs-num">01</div>
-      <div>
-        <div class="bs-title">Plan Your Layout</div>
-        <div class="bs-desc">Sketch a top-down view of your robot before touching any pieces. Decide where the brick, motors, and wheels go. The centre of gravity should sit between the two drive wheels.</div>
-        <div class="bs-tip">💡 Keep it compact and low. Sketch it — that sketch is part of your documentation.</div>
-      </div>
-    </div>
-    <div class="build-step">
-      <div class="bs-num">02</div>
-      <div>
-        <div class="bs-title">Mount Both Large Motors</div>
-        <div class="bs-desc">Attach the two large servo motors symmetrically on opposite sides of the chassis. Both output shafts must be on the same horizontal axis or the robot will drift when driving straight.</div>
-        <div class="bs-tip">💡 Use a beam across both motors to lock them at the same height. Uneven motors = uncontrollable drift.</div>
-      </div>
-    </div>
-    <div class="build-step">
-      <div class="bs-num">03</div>
-      <div>
-        <div class="bs-title">Attach the Drive Wheels</div>
-        <div class="bs-desc">Press the large traction wheels onto the motor axles and lock them with a bushing so they don't slip. Both wheels must be the same size.</div>
-        <div class="bs-tip">💡 Check that both wheels spin freely by hand before moving on.</div>
-      </div>
-    </div>
-    <div class="build-step">
-      <div class="bs-num">04</div>
-      <div>
-        <div class="bs-title">Add the Caster Wheel</div>
-        <div class="bs-desc">Mount a small caster at the front or rear. It must touch the ground evenly and let the robot pivot without scraping. Use spacers to match the height of the drive wheels.</div>
-        <div class="bs-tip">💡 If the robot tips forward or backward, adjust the caster height first.</div>
-      </div>
-    </div>
-    <div class="build-step">
-      <div class="bs-num">05</div>
-      <div>
-        <div class="bs-title">Mount the EV3 Brick</div>
-        <div class="bs-desc">Secure the EV3 brick to the chassis so the screen faces up and motor ports B and C are accessible. Centre it between the wheels to keep the weight balanced.</div>
-        <div class="bs-tip">💡 The brick is the heaviest part. Off-centre placement causes drift that programming can't fix.</div>
-      </div>
-    </div>
-    <div class="build-step">
-      <div class="bs-num">06</div>
-      <div>
-        <div class="bs-title">Connect the Motor Cables</div>
-        <div class="bs-desc">Plug the left motor into Port B and the right motor into Port C. Route cables so they can't catch in the wheels when the robot moves.</div>
-        <div class="bs-tip">💡 EV3 Classroom's stock programs expect B = left, C = right. Swapping them will make the robot turn the wrong way.</div>
-      </div>
-    </div>
-    <div class="build-step">
-      <div class="bs-num">07</div>
-      <div>
-        <div class="bs-title">Manual Roll Test</div>
-        <div class="bs-desc">Push the robot by hand on a flat surface. It should roll straight without veering. If it drifts, fix the mechanical issue now — no program will correct a physical misalignment.</div>
-        <div class="bs-tip">💡 Document anything you adjusted here. It's part of your engineering process.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROGRAMMING -->
-<section id="programming">
-  <div class="section-inner">
-    <div class="section-label">💻 Programming</div>
-    <h2 class="section-title">Coding Challenges</h2>
-    <p class="section-sub">All programs use the stock blocks from EV3 Classroom. Open the app, find the Driving Base unit, and follow each task below.</p>
-
-    <div class="stock-intro">
-      <div class="stock-intro-icon">📦</div>
-      <div class="stock-intro-text">
-        <strong>Using EV3 Classroom stock programs.</strong> You are not writing code from scratch. EV3 Classroom provides ready-made block programs for the Driving Base. Your job is to <strong>open each program, adjust the settings</strong> shown below, run it, and <strong>record what happens</strong>. The blocks shown on each task are what you'll see on screen.
-      </div>
-    </div>
-
-    <!-- Task 1 -->
-    <div class="task-block">
-      <div class="task-header">
-        <div class="task-num">01</div>
-        <div class="task-title">Move Forward — Timed</div>
-        <span class="task-badge tb-beg">STARTER</span>
-      </div>
-      <div class="task-body">
-        <div class="task-goal">Open the <strong>Move Forward</strong> stock program. Run it and observe how the robot moves. This confirms your motor ports are correct and the robot drives in a straight line.</div>
-        <div class="block-visual">
-          <div class="bv-label">EV3 CLASSROOM — BLOCK SEQUENCE</div>
-          <div class="blocks-row">
-            <div class="ev3-block block-green">
-              <div class="block-name">START</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-blue">
-              <div class="block-name">Move Steering</div>
-              <div class="block-val">Steering: 0 | Speed: 50%</div>
-              <div class="block-val">Duration: 3 seconds</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-red">
-              <div class="block-name">Stop</div>
-            </div>
+  <!-- OVERVIEW P2 -->
+  <section>
+    <div class="section-inner">
+      <div class="section-label section-label2">📋 Overview</div>
+      <h2 class="section-title">Project Overview</h2>
+      <p class="section-sub">The Color Sensor Sorting project uses the EV3 color sensor to detect different colors and trigger matching robot responses using Switch blocks.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.1rem;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">🎯</div><div style="font-weight:700;margin-bottom:.45rem;">Learning Objectives</div><div style="font-size:.83rem;color:var(--muted);line-height:1.75;">Learn how the EV3 color sensor detects reflected light. Use Switch blocks to make decisions based on color. Understand how sensors give robots awareness of their environment.</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">🎨</div><div style="font-weight:700;margin-bottom:.45rem;">How the Color Sensor Works</div><div style="font-size:.83rem;color:var(--muted);line-height:1.75;">The sensor shines a light downward and reads what bounces back. It identifies the color of the surface beneath it. Plug it into <strong style="color:var(--text);">Port 1</strong> and point it at the colored card you want to scan.</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">📦</div><div style="font-weight:700;margin-bottom:.45rem;">Stock Programs Used</div><div style="font-size:.83rem;color:var(--muted);line-height:1.75;">EV3 Classroom includes pre-built color sensor programs in the <strong style="color:var(--text);">Color Sensor</strong> unit. These use the Switch block to branch based on what color is detected.</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;"><div style="font-size:1.3rem;margin-bottom:.6rem;">🔄</div><div style="font-weight:700;margin-bottom:.45rem;">Detectable Colors</div>
+          <div class="color-swatches">
+            <div class="swatch"><div class="swatch-dot" style="background:#ff4040;"></div>Red</div>
+            <div class="swatch"><div class="swatch-dot" style="background:#f5c842;"></div>Yellow</div>
+            <div class="swatch"><div class="swatch-dot" style="background:#3de8b0;"></div>Green</div>
+            <div class="swatch"><div class="swatch-dot" style="background:#5bc0f5;"></div>Blue</div>
           </div>
         </div>
-        <div class="settings-grid">
-          <div class="setting-row"><span class="setting-key">Steering</span><span class="setting-val">0</span></div>
-          <div class="setting-row"><span class="setting-key">Speed</span><span class="setting-val">50%</span></div>
-          <div class="setting-row"><span class="setting-key">Duration</span><span class="setting-val">3 seconds</span></div>
-          <div class="setting-row"><span class="setting-key">Ports</span><span class="setting-val">B + C</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTS P2 -->
+  <section class="alt">
+    <div class="section-inner">
+      <div class="section-label section-label2">🧩 Materials</div>
+      <h2 class="section-title">Parts List</h2>
+      <p class="section-sub">In addition to the Driving Base parts, you'll need the color sensor and colored test cards.</p>
+      <div class="parts-grid">
+        <div class="part-card"><div class="part-icon">🧠</div><div><div class="part-name">EV3 Intelligent Brick</div><div class="part-detail">Already built from Project 1</div></div><div class="part-qty">×1</div></div>
+        <div class="part-card"><div class="part-icon">🎨</div><div><div class="part-name">EV3 Color Sensor</div><div class="part-detail">Port 1 · faces downward toward surface</div></div><div class="part-qty">×1</div></div>
+        <div class="part-card"><div class="part-icon">🔌</div><div><div class="part-name">Sensor Cable</div><div class="part-detail">EV3 connector cable for color sensor</div></div><div class="part-qty">×1</div></div>
+        <div class="part-card"><div class="part-icon">🟥</div><div><div class="part-name">Colored Cards / Tiles</div><div class="part-detail">Red, yellow, green, blue</div></div><div class="part-qty">×4</div></div>
+        <div class="part-card"><div class="part-icon">📏</div><div><div class="part-name">Sensor Mount Bracket</div><div class="part-detail">Technic beams to hold sensor at correct height</div></div><div class="part-qty">varies</div></div>
+        <div class="part-card"><div class="part-icon">💻</div><div><div class="part-name">EV3 Classroom App</div><div class="part-detail">Color Sensor unit selected</div></div><div class="part-qty">×1</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILD P2 -->
+  <section class="alt2">
+    <div class="section-inner">
+      <div class="section-label section-label2">🔧 Build Guide</div>
+      <h2 class="section-title">Build Steps</h2>
+      <p class="section-sub">You can use your existing Driving Base or build a simple stationary frame. The key requirement is correct sensor placement.</p>
+      <div class="build-step"><div class="bs-num bs-num2">01</div><div><div class="bs-title">Start With the Driving Base</div><div class="bs-desc">Your Driving Base from Project 1 is the starting point. You'll add the color sensor to the front of the robot pointing downward at the floor.</div><div class="bs-tip">💡 If your Driving Base is already working, don't rebuild it — just add the sensor mount.</div></div></div>
+      <div class="build-step"><div class="bs-num bs-num2">02</div><div><div class="bs-title">Build the Sensor Mount</div><div class="bs-desc">Use Technic beams to create a bracket that holds the color sensor at the front of the robot, facing straight down toward the surface. The ideal height is 1–2 cm above the ground.</div><div class="bs-tip">💡 Too high and the sensor gets confused by surrounding light. Too low and it scrapes the ground.</div></div></div>
+      <div class="build-step"><div class="bs-num bs-num2">03</div><div><div class="bs-title">Attach the Color Sensor</div><div class="bs-desc">Mount the EV3 color sensor onto the bracket so the light window faces directly downward. Secure it firmly — a wobbly sensor gives inconsistent readings.</div><div class="bs-tip">💡 The sensor has a small LED ring around the lens. When plugged in and active, it will glow the color it detects.</div></div></div>
+      <div class="build-step"><div class="bs-num bs-num2">04</div><div><div class="bs-title">Connect the Sensor Cable</div><div class="bs-desc">Plug the color sensor cable into Port 1 on the EV3 brick. Route the cable so it doesn't interfere with the wheels or get caught on anything.</div><div class="bs-tip">💡 EV3 Classroom's stock color programs expect the sensor on Port 1 by default.</div></div></div>
+      <div class="build-step"><div class="bs-num bs-num2">05</div><div><div class="bs-title">Prepare Your Color Cards</div><div class="bs-desc">Lay out your colored cards or tiles on a flat white surface. Make sure each card is large enough for the robot to pause over it — at least 10×10 cm.</div><div class="bs-tip">💡 Use bright, saturated colors. Faded or low-contrast colors may not register correctly.</div></div></div>
+      <div class="build-step"><div class="bs-num bs-num2">06</div><div><div class="bs-title">Sensor Test</div><div class="bs-desc">In EV3 Classroom, open the Port View on the brick display and move the sensor over each colored card. Confirm it correctly identifies all 4 colors before running any programs.</div><div class="bs-tip">💡 If a color is misread, try adjusting the sensor height or the room lighting.</div></div></div>
+    </div>
+  </section>
+
+  <!-- PROGRAMMING P2 -->
+  <section>
+    <div class="section-inner">
+      <div class="section-label section-label2">💻 Programming</div>
+      <h2 class="section-title">Coding Challenges</h2>
+      <p class="section-sub">All programs use EV3 Classroom's Color Sensor stock block programs. Open the app, find the Color Sensor unit, and follow each task.</p>
+      <div class="stock-intro"><div class="stock-intro-icon">🎨</div><div class="stock-intro-text"><strong>Using EV3 Classroom Color Sensor stock programs.</strong> Open each program, check the color settings in the Switch block match your cards, run it, and record what the robot does for each color.</div></div>
+
+      <div class="task-block">
+        <div class="task-header"><div class="task-num">01</div><div class="task-title">Detect a Color and Display It</div><span class="task-badge tb-beg">STARTER</span></div>
+        <div class="task-body">
+          <div class="task-goal">Open the stock Color Sensor program. Hold the sensor over each colored card and observe what appears on the EV3 screen. This confirms the sensor is working and correctly connected.</div>
+          <div class="block-visual"><div class="bv-label">BLOCK SEQUENCE</div><div class="blocks-row"><div class="ev3-block block-green"><div class="block-name">START</div></div><div class="block-arrow">→</div><div class="ev3-block block-yellow"><div class="block-name">Loop</div><div class="block-val">Unlimited</div></div><div class="block-arrow">→</div><div class="ev3-block block-teal"><div class="block-name">Color Sensor</div><div class="block-val">Port 1 | Read Color</div></div><div class="block-arrow">→</div><div class="ev3-block block-blue"><div class="block-name">Display</div><div class="block-val">Show color on screen</div></div></div></div>
+          <div class="settings-grid"><div class="setting-row"><span class="setting-key">Sensor Port</span><span class="setting-val2">Port 1</span></div><div class="setting-row"><span class="setting-key">Mode</span><span class="setting-val2">Color</span></div><div class="setting-row"><span class="setting-key">Loop</span><span class="setting-val2">Unlimited</span></div><div class="setting-row"><span class="setting-key">Output</span><span class="setting-val2">Screen Display</span></div></div>
+          <div class="doc-prompt"><strong>📝 Document:</strong><br><span>Which colors did the sensor correctly identify? Were any misread? What do you think caused any errors? Test all 4 colors and write down each result.</span></div>
         </div>
-        <div class="doc-prompt">
-          <strong>📝 Document your results:</strong><br>
-          <span>Did the robot go straight? Did it veer left or right? Try changing the speed to 30% then 75% — what difference did you notice? Write down each result.</span>
+      </div>
+
+      <div class="task-block">
+        <div class="task-header"><div class="task-num">02</div><div class="task-title">React to a Specific Color</div><span class="task-badge tb-int">CORE TASK</span></div>
+        <div class="task-body">
+          <div class="task-goal">Use the Switch block to make the robot do something different when it detects a specific color. For example: beep when it sees Red, and stay silent for everything else. Test it with all your color cards.</div>
+          <div class="block-visual"><div class="bv-label">BLOCK SEQUENCE</div><div class="blocks-row"><div class="ev3-block block-green"><div class="block-name">START</div></div><div class="block-arrow">→</div><div class="ev3-block block-yellow"><div class="block-name">Loop</div><div class="block-val">Unlimited</div></div><div class="block-arrow">→</div><div class="ev3-block block-teal"><div class="block-name">Color Sensor</div><div class="block-val">Port 1 | Read Color</div></div><div class="block-arrow">→</div><div class="ev3-block block-purple"><div class="block-name">Switch</div><div class="block-val">Case: Red → Beep</div><div class="block-val">Default → Do nothing</div></div><div class="block-arrow">→</div><div class="ev3-block block-red"><div class="block-name">Stop</div></div></div></div>
+          <div class="settings-grid"><div class="setting-row"><span class="setting-key">Sensor Port</span><span class="setting-val2">Port 1</span></div><div class="setting-row"><span class="setting-key">Switch Type</span><span class="setting-val2">Color</span></div><div class="setting-row"><span class="setting-key">Trigger Color</span><span class="setting-val2">Red (you choose)</span></div><div class="setting-row"><span class="setting-key">Action</span><span class="setting-val2">Sound · Beep</span></div></div>
+          <div class="doc-prompt"><strong>📝 Document:</strong><br><span>Which color did you choose to trigger? What action did you program? Did it work reliably? What happened with colors it wasn't programmed for?</span></div>
+        </div>
+      </div>
+
+      <div class="task-block">
+        <div class="task-header"><div class="task-num">03</div><div class="task-title">Sort Three Colors — Different Actions Each</div><span class="task-badge tb-adv">CHALLENGE</span></div>
+        <div class="task-body">
+          <div class="task-goal">Expand the Switch block to handle all four colors — Red, Yellow, Green, and Blue — each triggering a unique action. For example: Red = stop, Yellow = beep, Green = move forward, Blue = turn. Test each color card and document which actions you chose and why.</div>
+          <div class="block-visual"><div class="bv-label">BLOCK SEQUENCE</div><div class="blocks-row"><div class="ev3-block block-green"><div class="block-name">START</div></div><div class="block-arrow">→</div><div class="ev3-block block-yellow"><div class="block-name">Loop</div><div class="block-val">Unlimited</div></div><div class="block-arrow">→</div><div class="ev3-block block-teal"><div class="block-name">Color Sensor</div><div class="block-val">Port 1 | Color Mode</div></div><div class="block-arrow">→</div><div class="ev3-block block-purple"><div class="block-name">Switch</div><div class="block-val">Red → Action A</div><div class="block-val">Yellow → Action B</div><div class="block-val">Green → Action C</div><div class="block-val">Blue → Action D</div></div></div></div>
+          <div class="settings-grid"><div class="setting-row"><span class="setting-key">Red action</span><span class="setting-val2">you decide</span></div><div class="setting-row"><span class="setting-key">Yellow action</span><span class="setting-val2">you decide</span></div><div class="setting-row"><span class="setting-key">Green action</span><span class="setting-val2">you decide</span></div><div class="setting-row"><span class="setting-key">Blue action</span><span class="setting-val2">you decide</span></div></div>
+          <div class="doc-prompt"><strong>📝 Document:</strong><br><span>What action did you assign to each of the 4 colors? Why those choices? Were all four detected reliably? Did any color ever trigger the wrong action? How did you fix it?</span></div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Task 2 -->
-    <div class="task-block">
-      <div class="task-header">
-        <div class="task-num">02</div>
-        <div class="task-title">Move a Set Distance</div>
-        <span class="task-badge tb-int">CORE TASK</span>
-      </div>
-      <div class="task-body">
-        <div class="task-goal">Use the stock program to drive the robot a specific distance using rotations. Try to reach a target 1 metre away from the start. Adjust the rotations value until you get as close as possible.</div>
-        <div class="block-visual">
-          <div class="bv-label">EV3 CLASSROOM — BLOCK SEQUENCE</div>
-          <div class="blocks-row">
-            <div class="ev3-block block-green">
-              <div class="block-name">START</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-blue">
-              <div class="block-name">Move Steering</div>
-              <div class="block-val">Steering: 0 | Speed: 50%</div>
-              <div class="block-val">Rotations: ? (you decide)</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-red">
-              <div class="block-name">Stop</div>
-            </div>
-          </div>
-        </div>
-        <div class="settings-grid">
-          <div class="setting-row"><span class="setting-key">Steering</span><span class="setting-val">0</span></div>
-          <div class="setting-row"><span class="setting-key">Speed</span><span class="setting-val">50%</span></div>
-          <div class="setting-row"><span class="setting-key">Unit</span><span class="setting-val">Rotations</span></div>
-          <div class="setting-row"><span class="setting-key">Target</span><span class="setting-val">1 metre</span></div>
-        </div>
-        <div class="doc-prompt">
-          <strong>📝 Document your results:</strong><br>
-          <span>What rotation value did you start with? How far did the robot actually go? How many attempts did it take to reach 1 metre? What was your closest result?</span>
-        </div>
+  <!-- REFLECTION P2 -->
+  <section class="alt2">
+    <div class="section-inner">
+      <div class="section-label section-label2">💬 Reflection</div>
+      <h2 class="section-title">Student Reflection</h2>
+      <p class="section-sub">Each team member answers individually. Answers save automatically to your browser.</p>
+      <div class="reflection-grid">
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q1</span>Which color was hardest for the sensor to detect correctly? Why do you think that was?</div><textarea class="reflect-area p2-reflect" placeholder="Think about lighting, card material, sensor height..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q2</span>What actions did you choose for each color in Task 3? Why those ones?</div><textarea class="reflect-area p2-reflect" placeholder="Explain your reasoning for each colour-action pair..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q3</span>How is the Switch block similar to an if/else decision in everyday life?</div><textarea class="reflect-area p2-reflect" placeholder="Give a real-world example that works the same way..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q4</span>What would happen if two colors were very similar (like red and orange)? How would you fix it?</div><textarea class="reflect-area p2-reflect" placeholder="Think about sensor limitations and how you might work around them..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q5</span>How is this project different from the Driving Base? What new skill did you learn?</div><textarea class="reflect-area p2-reflect" placeholder="Compare the two projects — what's the main new concept?..."></textarea></div>
+        <div class="reflect-card"><div class="reflect-q"><span class="qmark">Q6</span>Where could a color-sorting robot be used in the real world?</div><textarea class="reflect-area p2-reflect" placeholder="Think about factories, recycling, food sorting, medicine..."></textarea></div>
       </div>
     </div>
+  </section>
 
-    <!-- Task 3 -->
-    <div class="task-block">
-      <div class="task-header">
-        <div class="task-num">03</div>
-        <div class="task-title">Turn Left and Right</div>
-        <span class="task-badge tb-int">CORE TASK</span>
-      </div>
-      <div class="task-body">
-        <div class="task-goal">Use the Move Steering block and adjust the Steering value to make the robot turn. Try to make it turn approximately 90° left, then 90° right. Adjust the steering and duration to get close.</div>
-        <div class="block-visual">
-          <div class="bv-label">EV3 CLASSROOM — BLOCK SEQUENCE</div>
-          <div class="blocks-row">
-            <div class="ev3-block block-green">
-              <div class="block-name">START</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-blue">
-              <div class="block-name">Move Steering</div>
-              <div class="block-val">Steering: -100 (full left)</div>
-              <div class="block-val">Duration: ? (you decide)</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-orange">
-              <div class="block-name">Wait</div>
-              <div class="block-val">0.5 seconds</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-blue">
-              <div class="block-name">Move Steering</div>
-              <div class="block-val">Steering: 100 (full right)</div>
-              <div class="block-val">Duration: ? (you decide)</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-red">
-              <div class="block-name">Stop</div>
-            </div>
-          </div>
-        </div>
-        <div class="settings-grid">
-          <div class="setting-row"><span class="setting-key">Left Turn</span><span class="setting-val">Steering: -100</span></div>
-          <div class="setting-row"><span class="setting-key">Right Turn</span><span class="setting-val">Steering: +100</span></div>
-          <div class="setting-row"><span class="setting-key">Speed</span><span class="setting-val">50%</span></div>
-          <div class="setting-row"><span class="setting-key">Duration</span><span class="setting-val">you decide</span></div>
-        </div>
-        <div class="doc-prompt">
-          <strong>📝 Document your results:</strong><br>
-          <span>What duration gave you the closest to 90°? Did left and right need the same value? What happened when you used Steering: -50 instead of -100?</span>
-        </div>
+  <!-- CHECKLIST P2 -->
+  <section>
+    <div class="section-inner">
+      <div class="section-label section-label2">✅ Completion</div>
+      <h2 class="section-title">Project Checklist</h2>
+      <p class="section-sub">Click each item to check it off. Progress saves automatically.</p>
+      <div class="pb-label"><span>Overall Progress</span><span id="p2-progress-count">0 / 12</span></div>
+      <div class="pb"><div class="pb-fill" id="p2-pb-fill" style="width:0%"></div></div>
+      <div class="checklist" id="p2-checklist">
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">All parts gathered including color sensor and cards</div><div class="ci-sub">Prep</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Sensor mount built and attached to robot</div><div class="ci-sub">Build · Step 02–03</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Color sensor cable connected to Port 1</div><div class="ci-sub">Build · Step 04</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Colored cards prepared and laid out</div><div class="ci-sub">Build · Step 05</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Port View sensor test passed for all 4 colors</div><div class="ci-sub">Build · Step 06</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Task 1: Color display program run, all 4 colors tested</div><div class="ci-sub">Programming · Task 01</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Task 1: Results recorded for each color</div><div class="ci-sub">Programming · Task 01</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Task 2: Single color trigger working and documented</div><div class="ci-sub">Programming · Task 02</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Task 3: Three-color Switch block program completed</div><div class="ci-sub">Programming · Task 03</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Task 3: All 4 color-action pairs tested and documented</div><div class="ci-sub">Programming · Task 03</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">All 6 reflection questions answered</div><div class="ci-sub">Reflection</div></div></div>
+        <div class="check-item" onclick="toggleCheck(this,'p2')"><div class="cb"></div><div><div class="ci-text">Photos taken of sensor setup and color tests</div><div class="ci-sub">Documentation</div></div></div>
       </div>
     </div>
+  </section>
 
-    <!-- Task 4 -->
-    <div class="task-block">
-      <div class="task-header">
-        <div class="task-num">04</div>
-        <div class="task-title">Drive a Square Path</div>
-        <span class="task-badge tb-adv">CHALLENGE</span>
-      </div>
-      <div class="task-body">
-        <div class="task-goal">Combine your straight driving and turning blocks into one program that drives a complete square. Use a Loop block so you only need to set the straight and turn blocks once. The robot should return close to its starting point.</div>
-        <div class="block-visual">
-          <div class="bv-label">EV3 CLASSROOM — BLOCK SEQUENCE</div>
-          <div class="blocks-row">
-            <div class="ev3-block block-green">
-              <div class="block-name">START</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-yellow">
-              <div class="block-name">Loop</div>
-              <div class="block-val">Count: 4</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-blue">
-              <div class="block-name">Move Steering</div>
-              <div class="block-val">Steer: 0 | Straight</div>
-              <div class="block-val">Your rotations value</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-blue">
-              <div class="block-name">Move Steering</div>
-              <div class="block-val">Steer: -100 | Turn</div>
-              <div class="block-val">Your turn duration</div>
-            </div>
-            <div class="block-arrow">→</div>
-            <div class="ev3-block block-red">
-              <div class="block-name">Stop</div>
-            </div>
-          </div>
-        </div>
-        <div class="settings-grid">
-          <div class="setting-row"><span class="setting-key">Loop Count</span><span class="setting-val">4 times</span></div>
-          <div class="setting-row"><span class="setting-key">Straight</span><span class="setting-val">your value</span></div>
-          <div class="setting-row"><span class="setting-key">Turn</span><span class="setting-val">your value</span></div>
-          <div class="setting-row"><span class="setting-key">Target</span><span class="setting-val">back to start</span></div>
-        </div>
-        <div class="doc-prompt">
-          <strong>📝 Document your results:</strong><br>
-          <span>Did the robot return to its starting position? Did the gap grow bigger with each loop? How many test runs did it take to get close? What values worked best?</span>
-        </div>
-      </div>
-    </div>
+</div><!-- /project 2 -->
 
-  </div>
-</section>
-
-<!-- REFLECTION -->
-<section id="reflection" class="alt2">
-  <div class="section-inner">
-    <div class="section-label">💬 Reflection</div>
-    <h2 class="section-title">Student Reflection</h2>
-    <p class="section-sub">Each team member should answer these questions individually. Quality of thinking matters more than length.</p>
-    <div class="reflection-grid">
-      <div class="reflect-card">
-        <div class="reflect-q"><span class="qmark">Q1</span>What was the hardest part of building the driving base?</div>
-        <textarea class="reflect-area" placeholder="Describe a specific problem your team ran into and how you solved it..."></textarea>
-      </div>
-      <div class="reflect-card">
-        <div class="reflect-q"><span class="qmark">Q2</span>How many tries did it take to drive 1 metre accurately? What did you change each time?</div>
-        <textarea class="reflect-area" placeholder="List your rotation values and the actual distances you measured..."></textarea>
-      </div>
-      <div class="reflect-card">
-        <div class="reflect-q"><span class="qmark">Q3</span>What does the Steering value in the Move Steering block actually control?</div>
-        <textarea class="reflect-area" placeholder="Explain it in your own words, based on what you observed..."></textarea>
-      </div>
-      <div class="reflect-card">
-        <div class="reflect-q"><span class="qmark">Q4</span>Did the square path error get bigger after each turn? Why do you think that happens?</div>
-        <textarea class="reflect-area" placeholder="Think about what a small turn error does when repeated 4 times..."></textarea>
-      </div>
-      <div class="reflect-card">
-        <div class="reflect-q"><span class="qmark">Q5</span>What would you change about your robot's physical build if you started again?</div>
-        <textarea class="reflect-area" placeholder="Think about weight, wheel placement, cable routing, caster position..."></textarea>
-      </div>
-      <div class="reflect-card">
-        <div class="reflect-q"><span class="qmark">Q6</span>What's one thing your team worked really well on together?</div>
-        <textarea class="reflect-area" placeholder="Think about communication, problem-solving, dividing tasks..."></textarea>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CHECKLIST -->
-<section id="checklist">
-  <div class="section-inner">
-    <div class="section-label">✅ Completion</div>
-    <h2 class="section-title">Project Checklist</h2>
-    <p class="section-sub">Click each item to check it off as your team completes it.</p>
-
-    <div class="pb-label"><span>Overall Progress</span><span id="progress-count">0 / 13</span></div>
-    <div class="pb"><div class="pb-fill" id="pb-fill" style="width:0%"></div></div>
-
-    <div class="checklist">
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">All parts gathered and checked against the list</div><div class="ci-sub">Prep</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Robot design sketched on paper before building</div><div class="ci-sub">Build · Step 01</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Both motors mounted symmetrically</div><div class="ci-sub">Build · Step 02</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Drive wheels and caster attached and level</div><div class="ci-sub">Build · Step 03–04</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">EV3 brick mounted, cables in Port B and C</div><div class="ci-sub">Build · Step 05–06</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Manual roll test passed</div><div class="ci-sub">Build · Step 07</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Task 1: Move Forward program run and results recorded</div><div class="ci-sub">Programming · Task 01</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Task 2: 1-metre distance achieved and documented</div><div class="ci-sub">Programming · Task 02</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Task 3: Left and right 90° turns tested and documented</div><div class="ci-sub">Programming · Task 03</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Task 4: Square path completed using Loop block</div><div class="ci-sub">Programming · Task 04</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">All 6 reflection questions answered by each member</div><div class="ci-sub">Reflection</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Photos taken at each build stage</div><div class="ci-sub">Documentation</div></div></div>
-      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><div><div class="ci-text">Results table filled in for all tasks</div><div class="ci-sub">Documentation</div></div></div>
-    </div>
-  </div>
-</section>
-
+<!-- SAVE INDICATOR -->
 <div id="save-indicator" style="position:fixed;bottom:1.4rem;right:1.4rem;z-index:200;background:var(--surface);border:1px solid rgba(61,232,176,.4);border-radius:8px;padding:.5rem 1rem;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent2);display:flex;align-items:center;gap:.5rem;opacity:0;transition:opacity .4s;pointer-events:none;"><span style="width:6px;height:6px;background:var(--accent2);border-radius:50%;display:block;"></span> Saved</div>
 
-<footer>EV3 Driving Base &mdash; <strong>Itaru · Yuga · Tintin · Chris · Caleb</strong> &mdash; EV3 Classroom · LEGO® MINDSTORMS®
-  <div style="margin-top:.8rem;"><button onclick="clearAllData()" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:.65rem;padding:.3rem .8rem;border-radius:6px;cursor:pointer;" onmouseover="this.style.borderColor='#ff5f5f';this.style.color='#ff5f5f'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🗑 Clear saved data</button></div>
+<footer>
+  EV3 Project Docs &mdash; <strong>Itaru · Yuga · Tintin · Chris · Caleb</strong> &mdash; EV3 Classroom · LEGO® MINDSTORMS®
+  <div style="margin-top:.8rem;">
+    <button onclick="clearAllData()" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:.65rem;padding:.3rem .8rem;border-radius:6px;cursor:pointer;" onmouseover="this.style.borderColor='#ff5f5f';this.style.color='#ff5f5f'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🗑 Clear all saved data</button>
+  </div>
 </footer>
 
 <script>
-  // ── Cookie helpers ──────────────────────────────────────────────
-  function setCookie(name, value, days) {
-    const expires = new Date(Date.now() + days * 864e5).toUTCString();
-    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+  // ── Cookie helpers ──────────────────────────────
+  function setCookie(name, val, days) {
+    const exp = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(val) + '; expires=' + exp + '; path=/; SameSite=Lax';
   }
   function getCookie(name) {
-    const match = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
-    return match ? decodeURIComponent(match[1]) : null;
+    const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+    return m ? decodeURIComponent(m[1]) : null;
   }
 
-  // ── Checklist ───────────────────────────────────────────────────
-  function updateProgress() {
-    const items = document.querySelectorAll('.check-item');
-    const done  = document.querySelectorAll('.check-item.done').length;
-    document.getElementById('progress-count').textContent = done + ' / ' + items.length;
-    document.getElementById('pb-fill').style.width = (done / items.length * 100) + '%';
+  // ── Project switcher ────────────────────────────
+  function switchProject(id, btn) {
+    document.querySelectorAll('.project-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.proj-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function saveChecklist() {
-    const states = [...document.querySelectorAll('.check-item')].map(el => el.classList.contains('done') ? '1' : '0');
-    setCookie('ev3_checklist', states.join(','), 90);
+  // ── Progress updater (per project) ──────────────
+  function updateProgress(proj) {
+    const items = document.querySelectorAll('#' + proj + '-checklist .check-item');
+    const done  = document.querySelectorAll('#' + proj + '-checklist .check-item.done').length;
+    document.getElementById(proj + '-progress-count').textContent = done + ' / ' + items.length;
+    document.getElementById(proj + '-pb-fill').style.width = (done / items.length * 100) + '%';
   }
 
-  function loadChecklist() {
-    const saved = getCookie('ev3_checklist');
-    if (!saved) return;
-    saved.split(',').forEach((val, i) => {
-      const el = document.querySelectorAll('.check-item')[i];
-      if (!el) return;
-      if (val === '1') {
-        el.classList.add('done');
-        el.querySelector('.cb').textContent = '✓';
-      }
-    });
-    updateProgress();
-  }
-
-  function toggleCheck(el) {
+  // ── Checklist toggle + save ─────────────────────
+  function toggleCheck(el, proj) {
     el.classList.toggle('done');
     el.querySelector('.cb').textContent = el.classList.contains('done') ? '✓' : '';
-    updateProgress();
-    saveChecklist();
+    updateProgress(proj);
+    saveChecklist(proj);
+    showSaved();
   }
 
-  // ── Reflection ──────────────────────────────────────────────────
-  function saveReflections() {
-    const answers = [...document.querySelectorAll('.reflect-area')].map(t => t.value);
-    setCookie('ev3_reflections', JSON.stringify(answers), 90);
+  function saveChecklist(proj) {
+    const states = [...document.querySelectorAll('#' + proj + '-checklist .check-item')]
+      .map(el => el.classList.contains('done') ? '1' : '0');
+    setCookie('ev3_' + proj + '_checklist', states.join(','), 90);
   }
 
-  function loadReflections() {
-    const saved = getCookie('ev3_reflections');
+  function loadChecklist(proj) {
+    const saved = getCookie('ev3_' + proj + '_checklist');
+    if (!saved) return;
+    saved.split(',').forEach((val, i) => {
+      const el = document.querySelectorAll('#' + proj + '-checklist .check-item')[i];
+      if (!el) return;
+      if (val === '1') { el.classList.add('done'); el.querySelector('.cb').textContent = '✓'; }
+    });
+    updateProgress(proj);
+  }
+
+  // ── Reflections save/load (per project) ─────────
+  function saveReflections(proj) {
+    const vals = [...document.querySelectorAll('.' + proj + '-reflect')].map(t => t.value);
+    setCookie('ev3_' + proj + '_reflect', JSON.stringify(vals), 90);
+  }
+
+  function loadReflections(proj) {
+    const saved = getCookie('ev3_' + proj + '_reflect');
     if (!saved) return;
     try {
       JSON.parse(saved).forEach((val, i) => {
-        const el = document.querySelectorAll('.reflect-area')[i];
+        const el = document.querySelectorAll('.' + proj + '-reflect')[i];
         if (el) el.value = val;
       });
     } catch(e) {}
   }
 
-  // ── Save indicator ──────────────────────────────────────────────
+  // ── Save indicator ───────────────────────────────
   let saveTimer;
   function showSaved() {
     clearTimeout(saveTimer);
@@ -731,29 +734,28 @@
     saveTimer = setTimeout(() => ind.style.opacity = '0', 2000);
   }
 
-  // ── Clear all ───────────────────────────────────────────────────
+  // ── Clear all ────────────────────────────────────
   function clearAllData() {
-    if (!confirm('Clear all saved checklist and reflection data?')) return;
-    setCookie('ev3_checklist', '', -1);
-    setCookie('ev3_reflections', '', -1);
-    document.querySelectorAll('.check-item').forEach(el => {
-      el.classList.remove('done');
-      el.querySelector('.cb').textContent = '';
+    if (!confirm('Clear ALL saved data for both projects?')) return;
+    ['p1','p2'].forEach(proj => {
+      setCookie('ev3_' + proj + '_checklist', '', -1);
+      setCookie('ev3_' + proj + '_reflect', '', -1);
+      document.querySelectorAll('#' + proj + '-checklist .check-item').forEach(el => {
+        el.classList.remove('done');
+        el.querySelector('.cb').textContent = '';
+      });
+      document.querySelectorAll('.' + proj + '-reflect').forEach(t => t.value = '');
+      updateProgress(proj);
     });
-    document.querySelectorAll('.reflect-area').forEach(t => t.value = '');
-    updateProgress();
   }
 
-  // ── Init on load ────────────────────────────────────────────────
+  // ── Init ─────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
-    loadChecklist();
-    loadReflections();
-
-    // Auto-save reflections on input
-    document.querySelectorAll('.reflect-area').forEach(ta => {
-      ta.addEventListener('input', () => {
-        saveReflections();
-        showSaved();
+    ['p1','p2'].forEach(proj => {
+      loadChecklist(proj);
+      loadReflections(proj);
+      document.querySelectorAll('.' + proj + '-reflect').forEach(ta => {
+        ta.addEventListener('input', () => { saveReflections(proj); showSaved(); });
       });
     });
   });
